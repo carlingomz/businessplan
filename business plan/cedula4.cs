@@ -66,6 +66,7 @@ namespace business_plan
             {
                 #region obtener Fecha anterior inicial
                 Fechainicial = dtpFechainicial.Text;
+                
                 query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechainicial + "';";
                 cmd = new MySqlCommand(query, Conn);
                 reader = cmd.ExecuteReader();
