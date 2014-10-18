@@ -8,25 +8,32 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using System.Globalization;
 
 namespace business_plan
 {
     public partial class Cedula3 : Form
     {
         #region variables conexion
-        MySqlConnection Conn;
+        MySqlConnection Conn,ConnCipsis;
         string query;
         MySqlCommand cmd;
         MySqlDataReader reader;
         private string conexion = "SERVER=10.10.1.76; DATABASE=dwh; user=root; PASSWORD=zaptorre;";
+        private string conexion2 = "SERVER=10.10.1.76; DATABASE=cipsis; user=root; PASSWORD=zaptorre;";
+        //private string conexion = "SERVER=localhost; DATABASE=cipsis; user=root; PASSWORD=;";
+        //private string conexion = "SERVER=localhost; DATABASE=dwh; user=root; PASSWORD= ;";
         #endregion
         #region variables globales
+        DateTime fecharecibo = DateTime.Now;
+        string fechareciboT = "";
+        string cedula1 = "";
         string[] idd = new string[1000];
         string Fechainicial = "", Fechafinal = "";
         string FechaAnteriorInicial = " ", FechaAnteriorFinal = "";
         DateTime FechaAI = DateTime.Now;
         DateTime FechaAF = DateTime.Now;
-        double costo = 0, cantidad = 0, plazo=0,importe=0,cantidadV=0,preciounit=0,rebajasimp=0,rebajaspor=0,costoneto=0; 
+        double costo = 0, cantidad = 0, plazo=0,importe=0,cantidadV=0,preciounit=0,rebajasimp=0,rebajaspor=0,costoneto=0,unidadesSaldo=0,importeSaldos=0,rotacion=0,diasINv=0; 
         int id = 0;
         string idsucursal = "Total";
         double[] cantidadA = new double[1000];
@@ -35,11 +42,22 @@ namespace business_plan
         public Cedula3()
         {
             InitializeComponent();
-            #region Abrir conexion
+            #region Abrir conexion dwh
             Conn = new MySqlConnection(conexion);
             try
             {
                 Conn.Open();
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            #endregion
+            #region Abrir conexion cipsis
+            ConnCipsis = new MySqlConnection(conexion2);
+            try
+            {
+                ConnCipsis.Open();
             }
             catch (MySqlException ex)
             {
@@ -137,9 +155,10 @@ namespace business_plan
                         if (idsucursal == "Total")
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '"+FechaAI.ToString("yyy-MM-dd")+"' AND '"+FechaAF.ToString("yyyy-MM-dd")+"';";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '"+FechaAI.ToString("yyyy-MM-dd")+"' AND '"+FechaAF.ToString("yyyy-MM-dd")+"';";
                             #endregion
                             #region ejecutar query
+                            cmd.CommandTimeout = 120;
                             cmd = new MySqlCommand(query, Conn);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
@@ -158,10 +177,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '"+FechaAI.ToString("yyyy-MM-dd")+"' AND '"+FechaAF.ToString("yyyy-MM-dd")+"';";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -217,8 +236,8 @@ namespace business_plan
                         }
                         else
                         {
-                            #region saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+"  AND F.FECHA BETWEEN '"+FechaAI.ToString("yyyy-MM-dd")+"' AND '"+FechaAF.ToString("yyyy-MM-dd")+"';";
+                            #region query saldos iniciales
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -239,23 +258,18 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
-                                if (reader["costo"].ToString() != "")
+                                if (reader["plazo"].ToString() != "")
                                 {
-                                    costo = double.Parse(reader["costo"].ToString());
+                                    plazo = double.Parse(reader["plazo"].ToString());
                                 }
-                                else { costo = 0; }
-                                if (reader["cantidad"].ToString() != "")
-                                {
-                                    cantidad = double.Parse(reader["cantidad"].ToString());
-                                }
-                                else { cantidad = 0; }
+                                else { plazo = 0; }
                             }
                             reader.Close();
                             #endregion
@@ -267,16 +281,36 @@ namespace business_plan
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
-                                if (reader["costo"].ToString() != "")
+                                if (reader["importe"].ToString() != "")
                                 {
-                                    costo = double.Parse(reader["costo"].ToString());
+                                    importe = double.Parse(reader["importe"].ToString());
                                 }
-                                else { costo = 0; }
+                                else { importe = 0; }
+
                                 if (reader["cantidad"].ToString() != "")
                                 {
-                                    cantidad = double.Parse(reader["cantidad"].ToString());
+                                    cantidadV = double.Parse(reader["cantidad"].ToString());
                                 }
-                                else { cantidad = 0; }
+                                else { cantidadV = 0; }
+
+                                if (reader["preciounit"].ToString() != "")
+                                {
+                                    preciounit = double.Parse(reader["preciounit"].ToString());
+                                }
+                                else { preciounit = 0; }
+
+                                if (reader["rebajasimp"].ToString() != "")
+                                {
+                                    rebajasimp = double.Parse(reader["rebajasimp"].ToString());
+                                }
+                                else { rebajasimp = 0; }
+
+                                if (reader["rebajaspor"].ToString() != "")
+                                {
+                                    rebajaspor = double.Parse(reader["rebajaspor"].ToString());
+                                }
+                                else { rebajaspor = 0; }
+
                             }
                             reader.Close();
                             #endregion
@@ -290,7 +324,7 @@ namespace business_plan
                         if (idsucursal == "Total")
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL="+idd[i]+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`iddivisiones`=1;";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -311,7 +345,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -327,7 +361,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -458,10 +492,11 @@ namespace business_plan
                         {
                             #region query y obtener datos
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones='"+idd[i]+"';";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`iddivisiones`="+idd[i]+";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -479,10 +514,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones='" + idd[i] + "';";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -495,7 +530,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones='" + idd[i] + "';";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.iddivisiones="+idd[i]+";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -539,7 +574,7 @@ namespace business_plan
                         else
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones='" + idd[i] + "';";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`iddivisiones`=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -560,10 +595,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones='" + idd[i] + "';";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -576,7 +611,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones='" + idd[i] + "';";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+" AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.iddivisiones=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -626,7 +661,7 @@ namespace business_plan
                         {
                             #region query y obtener datos
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`iddepto`=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -647,10 +682,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -663,7 +698,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.iddepto=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -707,7 +742,7 @@ namespace business_plan
                         else
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'  AND iddepto=" + idd[i] + ";";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`iddepto`=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -728,10 +763,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'  AND iddepto=" + idd[i] + ";";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -744,7 +779,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'  AND iddepto=" + idd[i] + ";";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+" AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.iddepto=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -795,7 +830,7 @@ namespace business_plan
                         if (idsucursal == "Total")
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`idfamilia`=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -816,10 +851,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -832,7 +867,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.idfamilia=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -876,7 +911,7 @@ namespace business_plan
                         else 
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'  AND idfamilia=" + idd[i] + ";";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`idfamilia`=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -897,10 +932,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'  AND idfamilia=" + idd[i] + ";";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -913,7 +948,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'  AND idfamilia=" + idd[i] + ";";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+" AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.idfamilia=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -963,7 +998,7 @@ namespace business_plan
                         if (idsucursal == "Total")
                         {
                             #region query saldos iniciales
-                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
+                            query = "SELECT SUM(costot) AS costo,SUM(ctd) AS cantidad FROM EXIST AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA INNER JOIN ventasbase AS b ON V.`idarticulo`=b.`idarticulo` WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND b.`idfamilia`=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -984,10 +1019,10 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region Compras
-                            query = "SELECT diaspp AS plazo FROM condicionesp AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
+                            query = "SELECT diaspp AS plazo FROM condicionesp AS V   INNER JOIN estarticulo AS E ON E.`marca`=V.`marca`;";
                             #endregion
                             #region ejecutar query
-                            cmd = new MySqlCommand(query, Conn);
+                            cmd = new MySqlCommand(query, ConnCipsis);
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -1000,7 +1035,7 @@ namespace business_plan
                             reader.Close();
                             #endregion
                             #region ventas
-                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
+                            query = "SELECT SUM(impllenototal) AS importe,SUM(ctdneta) AS cantidad ,(SUM(impllenototal)/SUM(ctdneta)) AS preciounit, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND V.idfamilia=" + idd[i] + ";";
                             #endregion
                             #region ejecutar query
                             cmd = new MySqlCommand(query, Conn);
@@ -2304,16 +2339,38 @@ namespace business_plan
                     else { }
                     #endregion
                     #region operaciones
+                    fecharecibo = DateTime.Parse(dtpFechaRecibo.Text);
+                    Math.Round(costo,2);
                     costoneto = cantidad / costo;
+                    Math.Round(costoneto,2);
+                    Math.Round(plazo,2);
+                    unidadesSaldo=cantidadA[i]-cantidadV;
+                    Math.Round(unidadesSaldo,2);
+                    importeSaldos=importeA[i]-importe;
+                    Math.Round(importeSaldos,2);
                     #endregion
+                    //----------------------Saldos iniciales----------------------//
                     dgvCed3.Rows[i].Cells[1].Value = cantidad.ToString();
                     dgvCed3.Rows[i].Cells[2].Value = costo.ToString("C2");
                     dgvCed3.Rows[i].Cells[3].Value = costoneto.ToString("C2");
+                    //----------------------Compras------------------------------//
+                    dgvCed3.Rows[i].Cells[4].Value=fecharecibo.ToString("yyyy-MM-dd");
                     dgvCed3.Rows[i].Cells[5].Value = plazo.ToString("C2");
                     dgvCed3.Rows[i].Cells[6].Value = cantidadA[i].ToString();
                     dgvCed3.Rows[i].Cells[7].Value = importeA[i].ToString("C2");
+                    //----------------------Ventas------------------------------//
+                    dgvCed3.Rows[i].Cells[8].Value=fecharecibo.ToString("yyyy-MM-dd");
                     dgvCed3.Rows[i].Cells[9].Value = cantidadV.ToString();
                     dgvCed3.Rows[i].Cells[10].Value = preciounit.ToString("C2");
+                    dgvCed3.Rows[i].Cells[11].Value = importe.ToString("C2");
+                    dgvCed3.Rows[i].Cells[12].Value=rebajaspor.ToString();
+                    dgvCed3.Rows[i].Cells[13].Value=rebajasimp.ToString("C2");
+                    //---------------------Saldos------------------------------//
+                    dgvCed3.Rows[i].Cells[14].Value=fecharecibo.ToString("yyyy-MM-dd");
+                    dgvCed3.Rows[i].Cells[15].Value=unidadesSaldo.ToString();
+                    dgvCed3.Rows[i].Cells[16].Value=importeSaldos.ToString("C2");
+                    dgvCed3.Rows[i].Cells[17].Value=rotacion.ToString();
+                    dgvCed3.Rows[i].Cells[18].Value = diasINv.ToString();
                 }
             }
         }
@@ -2611,7 +2668,7 @@ namespace business_plan
         private void comboBox1_DropDown(object sender, EventArgs e)
         {
             comboBox1.Items.Clear();
-            query = "SELECT * FROM cedula2;";
+            query = "SELECT  DISTINCT nombre FROM cedula2;";
             cmd = new MySqlCommand(query, Conn);
             reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -2624,16 +2681,68 @@ namespace business_plan
         private void comboBox1_TextChanged(object sender, EventArgs e)
         {
             int i = 0;
-            query = "SELECT * FROM cedula2 WHERE nombre='"+comboBox1.Text+"';";
+            int j = 0;
+            query = "SELECT DISTINCT * FROM cedula2 WHERE nombre='"+comboBox1.Text+"';";
             cmd = new MySqlCommand(query, Conn);
             reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 cantidadA[i] = double.Parse(reader["AUnid"].ToString());
                 importeA[i] = double.Parse(reader["AImpo"].ToString());
+                cedula1=reader["cedula1"].ToString();
                 i++;
             }
             reader.Close();
+
+            query = "SELECT * FROM escenarios WHERE Escenario='"+cedula1+"';";
+            cmd = new MySqlCommand(query, Conn);
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                rotacion=double.Parse(reader["DI"].ToString());
+                diasINv = double.Parse(reader["DI"].ToString());
+                j++;
+            }
+            reader.Close();
+        }
+
+        private void btnNuevo_Click(object sender, EventArgs e)
+        {
+            dtpEscenario.Value = DateTime.Now;
+            dtpFechafinal.Value = DateTime.Now;
+            dtpFechainicial.Value = DateTime.Now;
+            dtpFechaRecibo.Value = DateTime.Now;
+            comboBox1.Items.Clear();
+        }
+
+        private void btnGuardar_Click(object sender, EventArgs e)
+        {
+            double unidadesSi = 0, importeSi = 0, costnSi = 0, plazp = 0, unidadesR = 0, importeR = 0, UnidadesV = 0, precioU = 0, importV = 0, rebajap = 0, rebajai = 0, unid = 0, impS = 0, imporS = 0, Rot = 0, Di = 0;
+            for (int i = 0; i <= dgvCed3.Rows.Count; i++)
+            {
+                if (dgvCed3.Rows[0].Cells[0].Value != null)
+                {
+                    unidadesSi = double.Parse(dgvCed3.Rows[i].Cells[1].Value.ToString(), NumberStyles.Currency);
+                    importeSi = double.Parse(dgvCed3.Rows[i].Cells[2].Value.ToString(), NumberStyles.Currency);
+                    costnSi = double.Parse(dgvCed3.Rows[i].Cells[3].Value.ToString(), NumberStyles.Currency);
+                    plazp = double.Parse(dgvCed3.Rows[i].Cells[5].Value.ToString(), NumberStyles.Currency);
+                    unidadesR = double.Parse(dgvCed3.Rows[i].Cells[6].Value.ToString(), NumberStyles.Currency);
+                    importeR = double.Parse(dgvCed3.Rows[i].Cells[7].Value.ToString(), NumberStyles.Currency);
+                    UnidadesV = double.Parse(dgvCed3.Rows[i].Cells[9].Value.ToString(), NumberStyles.Currency);
+                    precioU = double.Parse(dgvCed3.Rows[i].Cells[10].Value.ToString(), NumberStyles.Currency);
+                    importV = double.Parse(dgvCed3.Rows[i].Cells[11].Value.ToString(), NumberStyles.Currency);
+                    rebajap = double.Parse(dgvCed3.Rows[i].Cells[12].Value.ToString(), NumberStyles.Currency);
+                    rebajai = double.Parse(dgvCed3.Rows[i].Cells[13].Value.ToString(), NumberStyles.Currency);
+                    unid = double.Parse(dgvCed3.Rows[i].Cells[15].Value.ToString(), NumberStyles.Currency);
+                    imporS = double.Parse(dgvCed3.Rows[i].Cells[16].Value.ToString(), NumberStyles.Currency);
+                    Rot = double.Parse(dgvCed3.Rows[i].Cells[17].Value.ToString(), NumberStyles.Currency);
+                    Di = double.Parse(dgvCed3.Rows[i].Cells[18].Value.ToString(), NumberStyles.Currency);
+                    query = "INSERT INTO  cedula3(nombre,estructura,estructura2,unidadessi,importessi,fecharecibo,plazopago,unidadesrecibo,importesrecibo,unidadesV,preciounitario,importeV,rebajaspor,rebajasi,unidadesS,importes,rotacion,DI) VALUES('"+tbnombre.Text+"','"+cbEstructura.Text+"','"+cbEstructura2.Text+"',)";
+                    cmd = new MySqlCommand(query, Conn);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            MessageBox.Show("guardado");
         }
     }
 }

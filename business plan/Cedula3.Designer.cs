@@ -35,27 +35,25 @@
             this.Column20 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column21 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column22 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column17 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column23 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column24 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.dtpFechaRecibo = new System.Windows.Forms.DateTimePicker();
+            this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -88,6 +86,7 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.dgvCed3Rep = new System.Windows.Forms.DataGridView();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.tbnombre = new System.Windows.Forms.TextBox();
             tabPage1 = new System.Windows.Forms.TabPage();
             tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCed3)).BeginInit();
@@ -122,29 +121,25 @@
             this.Column20,
             this.Column21,
             this.Column4,
-            this.Column22,
             this.Column6,
             this.Column7,
             this.Column8,
             this.Column9,
-            this.Column5,
             this.Column19,
             this.Column12,
             this.Column13,
             this.Column15,
             this.Column16,
             this.Column17,
-            this.Column10,
             this.Column11,
             this.Column2,
             this.Column3,
             this.Column14,
-            this.Column18,
             this.Column23,
             this.Column24});
-            this.dgvCed3.Location = new System.Drawing.Point(3, 181);
+            this.dgvCed3.Location = new System.Drawing.Point(3, 157);
             this.dgvCed3.Name = "dgvCed3";
-            this.dgvCed3.Size = new System.Drawing.Size(1245, 271);
+            this.dgvCed3.Size = new System.Drawing.Size(1343, 295);
             this.dgvCed3.TabIndex = 1;
             // 
             // Column1
@@ -173,12 +168,6 @@
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
             // 
-            // Column22
-            // 
-            this.Column22.HeaderText = "";
-            this.Column22.Name = "Column22";
-            this.Column22.ReadOnly = true;
-            // 
             // Column6
             // 
             this.Column6.HeaderText = "Fecha recibo";
@@ -202,12 +191,6 @@
             this.Column9.HeaderText = "Importe recibo";
             this.Column9.Name = "Column9";
             this.Column9.ReadOnly = true;
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "";
-            this.Column5.Name = "Column5";
-            this.Column5.ReadOnly = true;
             // 
             // Column19
             // 
@@ -245,12 +228,6 @@
             this.Column17.Name = "Column17";
             this.Column17.ReadOnly = true;
             // 
-            // Column10
-            // 
-            this.Column10.HeaderText = "";
-            this.Column10.Name = "Column10";
-            this.Column10.ReadOnly = true;
-            // 
             // Column11
             // 
             this.Column11.HeaderText = "Fecha";
@@ -275,12 +252,6 @@
             this.Column14.Name = "Column14";
             this.Column14.ReadOnly = true;
             // 
-            // Column18
-            // 
-            this.Column18.HeaderText = "";
-            this.Column18.Name = "Column18";
-            this.Column18.ReadOnly = true;
-            // 
             // Column23
             // 
             this.Column23.HeaderText = "Rotacion";
@@ -295,6 +266,9 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.tbnombre);
+            this.panel1.Controls.Add(this.dtpFechaRecibo);
+            this.panel1.Controls.Add(this.label11);
             this.panel1.Controls.Add(this.label10);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.label5);
@@ -319,6 +293,24 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1348, 148);
             this.panel1.TabIndex = 0;
+            // 
+            // dtpFechaRecibo
+            // 
+            this.dtpFechaRecibo.CustomFormat = "yyyy-MM-dd";
+            this.dtpFechaRecibo.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtpFechaRecibo.Location = new System.Drawing.Point(613, 66);
+            this.dtpFechaRecibo.Name = "dtpFechaRecibo";
+            this.dtpFechaRecibo.Size = new System.Drawing.Size(78, 20);
+            this.dtpFechaRecibo.TabIndex = 40;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(569, 67);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(37, 13);
+            this.label11.TabIndex = 39;
+            this.label11.Text = "Fecha";
             // 
             // label10
             // 
@@ -409,6 +401,7 @@
             this.btnNuevo.TabIndex = 31;
             this.btnNuevo.Text = "Nuevo";
             this.btnNuevo.UseVisualStyleBackColor = true;
+            this.btnNuevo.Click += new System.EventHandler(this.btnNuevo_Click);
             // 
             // cbEstructura
             // 
@@ -454,6 +447,7 @@
             this.btnGuardar.TabIndex = 27;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
+            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
             // dtpFechafinal
             // 
@@ -659,6 +653,13 @@
             this.panel2.Size = new System.Drawing.Size(1348, 100);
             this.panel2.TabIndex = 0;
             // 
+            // tbnombre
+            // 
+            this.tbnombre.Location = new System.Drawing.Point(962, 65);
+            this.tbnombre.Name = "tbnombre";
+            this.tbnombre.Size = new System.Drawing.Size(100, 20);
+            this.tbnombre.TabIndex = 41;
+            // 
             // Cedula3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -727,26 +728,25 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column20;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column21;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column22;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column9;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column17;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column23;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column24;
+        private System.Windows.Forms.DateTimePicker dtpFechaRecibo;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TextBox tbnombre;
 
     }
 }
