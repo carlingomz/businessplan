@@ -20,8 +20,8 @@ namespace business_plan
         string query;
         MySqlCommand cmd;
         MySqlDataReader reader;
-         private string conexion = "SERVER=localhost; DATABASE=dwh; user=root; PASSWORD= ;";
-        //private string conexion = "SERVER=10.10.1.76; DATABASE=dwh; user=root; PASSWORD=zaptorre;";
+        // private string conexion = "SERVER=localhost; DATABASE=dwh; user=root; PASSWORD= ;";
+        private string conexion = "SERVER=10.10.1.76; DATABASE=dwh; user=root; PASSWORD=zaptorre;";
         #endregion
         #region variables globales
         string[] idd = new string[1000];
@@ -131,16 +131,20 @@ namespace business_plan
                            #region query
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                             m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND "+ divisiones +" = " +idd[i]+ " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
-                          if (venta == "") { venta = "0"; }  if (ventatotal == "") { ventatotal = "0"; }
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND iddivisiones= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                         }
+                             
+                                m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                                if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                                query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND iddivisiones= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            
+                        }
                         else
                         {
-                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+ idsucursal +"AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
-                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
-                             query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " +idsucursal+ "AND iddivisiones= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                       }
+                              
+                                m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                                if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                                query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND iddivisiones= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            
+                            }
                         #endregion
                         m_llenardgv(query);  
                      }
@@ -540,11 +544,16 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                   dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["iddivisiones"].ToString();
-
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL")
+                    { }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["iddivisiones"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -554,18 +563,23 @@ namespace business_plan
             #region Departamento
             if (SeleccionActual == "Departamento")
             {
-                divisiones = "idepto";
+                divisiones = "iddepto";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,iddepto from estdepartamento;";
                 cmd = new MySqlCommand(query, Conn);
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["iddepto"].ToString();
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL")
+                    {  }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["iddepto"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -582,12 +596,16 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idfamilia"].ToString();
-
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL")
+                    { }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["idfamilia"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -604,12 +622,16 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idlinea"].ToString();
-
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL")
+                    {   }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["idlinea"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -626,12 +648,17 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl1"].ToString();
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                    { }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["idl1"].ToString();
+                        i++;
+                    }
 
-                    i++;
                 }
                 reader.Close();
             }
@@ -648,12 +675,17 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl2"].ToString();
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl2"].ToString();
 
-                    i++;
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -670,10 +702,15 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl3"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {    dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl3"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -690,10 +727,17 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl4"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl4"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -710,10 +754,16 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl5"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl5"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -730,11 +780,16 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl6"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl6"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -751,10 +806,16 @@ namespace business_plan
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                     dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["marca"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["marca"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
