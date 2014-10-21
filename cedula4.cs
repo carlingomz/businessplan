@@ -17,9 +17,11 @@ namespace business_plan
     {
         #region variables conexion
         MySqlConnection Conn;
+        
         string query;
         MySqlCommand cmd;
         MySqlDataReader reader;
+       
         // private string conexion = "SERVER=localhost; DATABASE=dwh; user=root; PASSWORD= ;";
         private string conexion = "SERVER=10.10.1.76; DATABASE=dwh; user=root; PASSWORD=zaptorre;";
         #endregion
@@ -31,6 +33,7 @@ namespace business_plan
         DateTime FechaAF = DateTime.Now;
         double margeninipor=0.0,margeniniImp=0.0,rebajaspor=0.0,rebajasimp=0.0,margenfinpor=0.0,margenfinImp=0.0,dppPor=0.0,dppImp=0.0,utilidadpor=0.0,utilidadImp=0.0;
       
+       
         string fechainicialsuma = "";
         string fechafinalsuma = "";
         double gastototal = 0;
@@ -49,9 +52,13 @@ namespace business_plan
             try
             {
                 Conn.Open();
-            }
+              //  cmd.CommandType = CommandType.StoredProcedure;
+               // cmd.CommandTimeout = 0;
+             //   cmd.CommandTimeout(0);
+             }
             catch (MySqlException ex)
             {
+                
                 MessageBox.Show(ex.ToString());
             }
             #endregion
@@ -65,6 +72,7 @@ namespace business_plan
                 Fechainicial = dtpFechainicial.Text;
                 query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechainicial + "';";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -97,7 +105,7 @@ namespace business_plan
                 MessageBox.Show("Error con las fechas " + x);
             }
 
-            for (int i = 0; i <= dgvCed4.Rows.Count - 1; i++)
+             for (int i = 0; i <= dgvCed4.Rows.Count - 1; i++)//(int i = 0; i <= 20 - 1; i++) ///
             {
 
                 if (dgvCed4.Rows[i].Cells[0].Value != null)
@@ -199,8 +207,7 @@ namespace business_plan
                             m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
                             if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
                             query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idlinea= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                   
-                         }
+                          }
                         else
                         {
                             m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
@@ -234,7 +241,7 @@ namespace business_plan
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 2")
+                    if (cbEstructura2.Text == "Linea 2")
                     {
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
@@ -256,7 +263,7 @@ namespace business_plan
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 3")
+                    if (cbEstructura2.Text == "Linea 3")
                     {
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
@@ -278,7 +285,7 @@ namespace business_plan
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 4")
+                    if (cbEstructura2.Text == "Linea 4")
                     {
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
@@ -299,7 +306,7 @@ namespace business_plan
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 5")
+                    if (cbEstructura2.Text == "Linea 5")
                     {
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
@@ -320,7 +327,7 @@ namespace business_plan
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 6")
+                    if (cbEstructura2.Text == "Linea 6")
                     {
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
@@ -343,19 +350,19 @@ namespace business_plan
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Marca")
+                    if (cbEstructura2.Text == "Marca")
                     {
 
                         #region query
                         if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
                             if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
                             query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND marca= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                         else
                         {
-                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
                             if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
                             query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND marca= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                      
@@ -443,6 +450,7 @@ namespace business_plan
                 #region comprobar nombre
                 query = "SELECT Escenario from cedula4 where Escenario='" + tbEscenario.Text + "'";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -477,6 +485,7 @@ namespace business_plan
                             #region actualizar
                             query = "UPDATE cedula4 SET margeniniPor=" +margeninipor.ToString()+ ",margeniniImp=" +margeniniImp+ ",rebajasPor=" +rebajaspor.ToString() + ",rebajasImp=" + rebajasimp.ToString() + ",margenfinPor=" + margenfinpor.ToString() + ",margenfinImp=" +margenfinImp.ToString()+ ",dppPor=" + dppPor.ToString() + ",dppImp=" +dppImp.ToString() + ",utilidadPor=" + utilidadpor.ToString() + ",utilidadImp=" + utilidadpor.ToString()+" where Escenario='" + tbEscenario.Text + "'";
                             cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;
                             cmd.ExecuteNonQuery();
                             #endregion
                         }
@@ -509,6 +518,7 @@ namespace business_plan
                         #region insertar
                         query = "INSERT INTO  cedula4 (Escenario,margeniniPor,margeniniImp,rebajasPor,rebajasImp,margenfinPor,margenfinImp,dppPor,dppImp,utilidadPor,utilidadImp) VALUES('" + tbEscenario.Text + "'," + margeninipor.ToString() + "," + margeniniImp.ToString() + "," + rebajaspor.ToString() + "," + rebajasimp.ToString() + "," + margenfinpor.ToString() + "," + margenfinImp.ToString() + "," + dppPor.ToString() + "," + dppImp.ToString() + "," + utilidadpor.ToString() + "," + utilidadImp.ToString() + ")";
                         cmd = new MySqlCommand(query, Conn);
+                        cmd.CommandTimeout = 0;
                         cmd.ExecuteNonQuery();
                         #endregion
                     }
@@ -541,6 +551,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT descrip,iddivisiones from estdivisiones;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -567,6 +578,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,iddepto from estdepartamento;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -593,6 +605,8 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idfamilia from estfamilia;";
                 cmd = new MySqlCommand(query, Conn);
+
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -619,6 +633,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idlinea from estlinea;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -645,6 +660,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl1 from estl1;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -672,6 +688,8 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl2 from estl2;";
                 cmd = new MySqlCommand(query, Conn);
+
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -699,6 +717,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl3 from estl3;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -724,6 +743,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl4 from estl4;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -751,6 +771,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl5 from estl5;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -777,6 +798,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip, idl6 from estl6;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -803,6 +825,7 @@ namespace business_plan
                 dgvCed4.Rows.Clear();
                 query = "SELECT marca, descrip  from marca;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -865,6 +888,7 @@ namespace business_plan
                                 query = "SELECT gasto FROM gasto WHERE gasto.month = '0" + vmes1 + "' AND gasto.year = '" + vano1 + "'";
                             }
                             cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;//pos solucion
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -888,6 +912,7 @@ namespace business_plan
                             #region mes2 menor que mes1
                             query = "SELECT * FROM gasto WHERE gasto.month = '" + mes1 + "' AND gasto.year = '" + vano1 + "'";
                             cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;//pos solucion
                             reader = cmd.ExecuteReader();
                             while (reader.Read())
                             {
@@ -915,6 +940,7 @@ namespace business_plan
         {
             query = queryventa;
             cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
             reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -931,6 +957,7 @@ namespace business_plan
             string f2 = Convert.ToString(fecha2.Substring(6, 4)) + "-" + Convert.ToString(fecha2.Substring(3, 2)) + "-" + Convert.ToString(fecha2.Substring(0, 2));
             query = "SELECT SUM(impneto) AS ventatot,SUM(ctdneta) AS cantidadtot FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + f1 + " 'AND' " + f2 + "'"; ;
             cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
             reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -945,6 +972,7 @@ namespace business_plan
         {
             query = queryventa;
             cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
             reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -957,7 +985,8 @@ namespace business_plan
         public void m_llenardgv(string query)
         { 
 #region llenardgv
-                 cmd = new MySqlCommand(query, Conn);
+            cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
             
                 reader = cmd.ExecuteReader();
                 
