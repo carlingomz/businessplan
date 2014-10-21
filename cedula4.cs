@@ -559,8 +559,7 @@ namespace business_plan
                     if (ocultar == "GENERAL")
                     { }
                     else
-                    { 
-
+                    {
                         dgvCed4.Rows.Add();
                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
                         idd[i] = reader["iddivisiones"].ToString();
