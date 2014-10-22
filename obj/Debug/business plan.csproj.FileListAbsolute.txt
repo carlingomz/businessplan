@@ -1,0 +1,55 @@
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\bin\Debug\business plan.exe.config
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\bin\Debug\business plan.exe.manifest
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\bin\Debug\business plan.application
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\bin\Debug\business plan.exe
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\bin\Debug\business plan.pdb
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business_plan.Cedula_2.resources
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business_plan.Cedula1.resources
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business_plan.Cedula3.resources
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business_plan.Log_in.resources
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business_plan.Menu.resources
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business_plan.Properties.Resources.resources
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business plan.csproj.GenerateResource.Cache
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business plan.exe.manifest
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business plan.application
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business plan.exe
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business plan.pdb
+C:\Users\carlos\documents\visual studio 2013\Projects\business plan\business plan\obj\Debug\business plan.csprojResolveAssemblyReference.cache
+C:\Users\carlos\Documents\git\business plan\business plan\bin\Debug\business plan.exe.config
+C:\Users\carlos\Documents\git\business plan\business plan\bin\Debug\business plan.exe.manifest
+C:\Users\carlos\Documents\git\business plan\business plan\bin\Debug\business plan.application
+C:\Users\carlos\Documents\git\business plan\business plan\bin\Debug\business plan.exe
+C:\Users\carlos\Documents\git\business plan\business plan\bin\Debug\business plan.pdb
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.Cedula_2.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.Cedula1.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.Cedula3.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.cedula4.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.Log_in.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.Menu.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business_plan.Properties.Resources.resources
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business plan.csproj.GenerateResource.Cache
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business plan.exe.manifest
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business plan.application
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business plan.exe
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business plan.pdb
+C:\Users\carlos\Documents\git\business plan\business plan\obj\Debug\business plan.csprojResolveAssemblyReference.cache
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\bin\Debug\business plan.exe.config
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business plan.exe
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business plan.pdb
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\bin\Debug\business plan.exe.manifest
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\bin\Debug\business plan.application
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\bin\Debug\business plan.exe
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\bin\Debug\business plan.pdb
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business plan.csprojResolveAssemblyReference.cache
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.Cedula_2.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.Cedula1.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.Cedula3.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.Log_in.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.Menu.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.Properties.Resources.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business plan.csproj.GenerateResource.Cache
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business plan.exe.manifest
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business plan.application
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula5.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula4.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula6.resources
