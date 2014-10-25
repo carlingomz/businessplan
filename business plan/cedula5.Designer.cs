@@ -867,7 +867,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1229, 284);
+            this.tabPage2.Size = new System.Drawing.Size(1247, 389);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Reportes";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -904,9 +904,9 @@
             // 
             this.panel2.Controls.Add(this.dgvRep);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(3, -57);
+            this.panel2.Location = new System.Drawing.Point(3, 48);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1223, 338);
+            this.panel2.Size = new System.Drawing.Size(1241, 338);
             this.panel2.TabIndex = 1;
             // 
             // dgvRep
