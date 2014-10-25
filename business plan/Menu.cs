@@ -47,5 +47,12 @@ namespace business_plan
             c4.Show();
             this.Close();
         }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            cedula5 c5 = new cedula5();
+            c5.Show();
+            this.Close();
+        }
     }
 }

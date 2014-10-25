@@ -297,509 +297,532 @@ namespace business_plan
             TasaInt = double.Parse(tbInflacion.Text);
             for (int i = 0; i <= dgvCed1.Rows.Count - 1; i++)
             {
+                #region cueros
+                try
+                {
+                    #region obtener Fecha anterior inicial
+
+                    Fechainicial = dtpFechainicial.Text;
+                    query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechainicial + "';";
+                    cmd = new MySqlCommand(query, Conn);
+                    reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        FechaAI = DateTime.Parse(reader["FechaAnterior"].ToString());
+                    }
+                    reader.Close();
+
+                    #endregion obtener Fecha anterior inicial
+
+                    #region Obtener Fecha anterior final
+
+                    Fechafinal = dtpFechafinal.Text;
+                    query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechafinal + "';";
+                    cmd = new MySqlCommand(query, Conn);
+                    reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        FechaAF = DateTime.Parse(reader["FechaAnterior"].ToString());
+                    }
+                    reader.Close();
+
+                    #endregion Obtener Fecha anterior final
+                }
+                catch (Exception x)
+                {
+                    MessageBox.Show("Error con las fechas " + x);
+                }
+                try
+                {
+                    if (cbEstructura2.Text == "Total")
+                    {
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Sucursal")
+                    {
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + " AND V.IDSUCURSAL='" + idd[i] + "';";
+
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Division")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND iddivisiones=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Departamento")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
+
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Familia")
+                    {
+
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Linea")
+                    {
+
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Linea 1")
+                    {
+
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl1=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl1=" + idd[i] + ";";
+
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "l2")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl2=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl2=" + idd[i] + ";";
+
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "l3")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl3=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl3=" + idd[i] + ";";
+
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "l4")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl4=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl4=" + idd[i] + ";";
+
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "l5")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl5=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl5=" + idd[i] + ";";
+
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "l6")
+                    {
+                        if (idsucursal == "Total")
+                        {
+                            #region query
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl6=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl6=" + idd[i] + ";";
+
+                        }
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                    if (cbEstructura2.Text == "Marca")
+                    {
+
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND marca=" + idd[i] + ";";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND marca=" + idd[i] + ";";
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                                PVunit = 0;
+                            }
+                            else
+                            {
+                                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                            }
+                        }
+
+                        reader.Close();
+                        #endregion
+                        reader.Close();
+                    }
+                    else { }
+                }
+                catch (Exception y)
+                {
+                    MessageBox.Show("Error " + y);
+                }
+                #endregion
+                #region caso 1
                 if (dgvCed1.Rows[i].Cells[1].Value != null && dgvCed1.Rows[i].Cells[2].Value != null)
                 {
                     nInv = int.Parse(dgvCed1.Rows[i].Cells[1].Value.ToString(), NumberStyles.Currency);
                     RinvD = int.Parse(dgvCed1.Rows[i].Cells[2].Value.ToString(), NumberStyles.Currency);
+                    TimeSpan dias = FechaAF.Subtract(FechaAI);
+                    TasaInt = (TasaInt / 100) + 1;
+                    DI = Math.Round(double.Parse(dias.Days.ToString()) / RinvD, 2);
+                    VmI = ((PVunit * PrP) / 12)*TasaInt;
+                    VdI = ((PrP * PVunit) / double.Parse(dias.Days.ToString()))*TasaInt;
+                    VTI = (PrP * PVunit)*TasaInt;
+
+                    PVunit = PVunit * TasaInt;
                     PrP = Math.Round(nInv * RinvD, 0);
                     VmP = Math.Round(PrP / 12, 0);
                     VdP = Math.Round(PrP / 365, 0);
-                    DI = Math.Round(365 / RinvD, 2);
-                    try
-                    {
-                        #region obtener Fecha anterior inicial
+                
+                }
+                else { }
+                #endregion
+                #region caso 2
+                //if (dgvCed1.Rows[i].Cells[2].Value != null && dgvCed1.Rows[i].Cells[3].Value != null)
+                //{
+                //    nInv = int.Parse(dgvCed1.Rows[i].Cells[1].Value.ToString(), NumberStyles.Currency);
+                //    VTI = int.Parse(dgvCed1.Rows[i].Cells[3].Value.ToString(), NumberStyles.Currency);
+                //    TimeSpan dias = FechaAF.Subtract(FechaAI);
+                //    RinvD = int.Parse(dgvCed1.Rows[i].Cells[2].Value.ToString(), NumberStyles.Currency);
+                //    TasaInt = (TasaInt / 100) + 1;
+                //    DI = Math.Round(double.Parse(dias.Days.ToString()) / RinvD, 2);
+                //    VmI = Math.Round((PVunit * PrP) / 12);
+                //    VdI = Math.Round((PrP * PVunit) / double.Parse(dias.Days.ToString()));
+                    
+                //    VmI = VmI * TasaInt;
+                //    VdI = VdI * TasaInt;
+                //    PVunit = PVunit * TasaInt;
+                //    PrP = Math.Round(nInv * RinvD, 0);
+                //    VmP = Math.Round(PrP / 12, 0);
+                //    VdP = Math.Round(PrP / 365, 0);
+                //}
+                #endregion
+                try
+                {
+                    #region Mostrar en dgvCed1
+                    dgvCed1.Rows[i].Cells[2].Value=RinvD.ToString();
+                    dgvCed1.Rows[i].Cells[3].Value = VTI.ToString("C0");
+                    dgvCed1.Rows[i].Cells[4].Value = PrP.ToString("00,0");
+                    dgvCed1.Rows[i].Cells[5].Value = PVunit.ToString("C0");
+                    dgvCed1.Rows[i].Cells[6].Value = VmP.ToString("C0");
+                    dgvCed1.Rows[i].Cells[7].Value = VmI.ToString("C0");
+                    dgvCed1.Rows[i].Cells[8].Value = VdP.ToString();
+                    dgvCed1.Rows[i].Cells[9].Value = VdI.ToString("C0");
+                    dgvCed1.Rows[i].Cells[10].Value = DI.ToString();
 
-                        Fechainicial = dtpFechainicial.Text;
-                        query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechainicial + "';";
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            FechaAI = DateTime.Parse(reader["FechaAnterior"].ToString());
-                        }
-                        reader.Close();
-
-                        #endregion obtener Fecha anterior inicial
-
-                        #region Obtener Fecha anterior final
-
-                        Fechafinal = dtpFechafinal.Text;
-                        query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechafinal + "';";
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            FechaAF = DateTime.Parse(reader["FechaAnterior"].ToString());
-                        }
-                        reader.Close();
-
-                        #endregion Obtener Fecha anterior final
-                    }
-                    catch (Exception x)
-                    {
-                        MessageBox.Show("Error con las fechas " + x);
-                    }
-                    try
-                    {
-                        if (cbEstructura2.Text == "Total")
-                        {
-                            #region query
-                            if (idsucursal == "Total")
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                            }
-                            else
-                            {
-                               query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                            }
-                            #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString()=="")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-                            reader.Close();
-
-                            #endregion
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Sucursal")
-                        {
-                            #region query
-                            if (idsucursal == "Total")
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + " AND V.IDSUCURSAL='"+idd[i]+"';";
-
-                            }
-                            #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Division")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddivisiones=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                 query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND iddivisiones=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Departamento")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND iddepto=" + idd[i] + ";";
-
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Familia")
-                        {
-
-                            #region query
-                            if (idsucursal == "Total")
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idfamilia=" + idd[i] + ";";
-                            }
-                            #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Linea")
-                        {
-
-                            #region query
-                            if (idsucursal == "Total")
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idlinea=" + idd[i] + ";";
-                            }
-                            #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Linea 1")
-                        {
-
-                            #region query
-                            if (idsucursal == "Total")
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl1=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl1=" + idd[i] + ";";
-
-                            }
-                            #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "l2")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl2=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl2=" + idd[i] + ";";
-
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "l3")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl3=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl3=" + idd[i] + ";";
-
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "l4")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl4=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl4=" + idd[i] + ";";
-
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "l5")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl5=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl5=" + idd[i] + ";";
-
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "l6")
-                        {
-                            if (idsucursal == "Total")
-                            {
-                                #region query
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl6=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND idl6=" + idd[i] + ";";
-
-                            }
-                                #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                        if (cbEstructura2.Text == "Marca")
-                        {
-
-                            #region query
-                            if (idsucursal == "Total")
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND marca=" + idd[i] + ";";
-                            }
-                            else
-                            {
-                                query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  "+idsucursal+"  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "' AND marca=" + idd[i] + ";";
-                            }
-                            #endregion
-                            #region llenardgv
-                            cmd = new MySqlCommand(query, Conn);
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                if (reader["prom"].ToString() == "")
-                                {
-                                    PVunit = 0;
-                                }
-                                else
-                                {
-                                    PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                                }
-                            }
-
-                            reader.Close();
-                            #endregion
-                            reader.Close();
-                        }
-                        else { }
-                    }
-                    catch (Exception y)
-                    {
-                        MessageBox.Show("Error " + y);
-                    }
-                    try
-                    {
-                        TasaInt = (TasaInt / 100)+1;
-                        VmI = Math.Round((PVunit * PrP) / 12);
-                        VdI = Math.Round((PrP * PVunit) / 360);
-                        VTI = Math.Round(PrP * PVunit);
-
-                        VTI = VTI * TasaInt;
-                        VmI = VmI * TasaInt;
-                        VdI = VdI * TasaInt;
-                        PVunit = PVunit * TasaInt;
-
-                        #region Mostrar en dgvCed1
-
-                        dgvCed1.Rows[i].Cells[3].Value = VTI.ToString("C2");
-                        dgvCed1.Rows[i].Cells[4].Value = PrP.ToString("00,0");
-                        dgvCed1.Rows[i].Cells[5].Value = PVunit.ToString("C2");
-                        dgvCed1.Rows[i].Cells[6].Value = VmP.ToString("C2");
-                        dgvCed1.Rows[i].Cells[7].Value = VmI.ToString("C2");
-                        dgvCed1.Rows[i].Cells[8].Value = VdP.ToString();
-                        dgvCed1.Rows[i].Cells[9].Value = VdI.ToString("C2");
-                        dgvCed1.Rows[i].Cells[10].Value = DI.ToString();
-
-                        #endregion Mostrar en dgvCed1
-                    }
-                    catch (Exception z)
-                    {
-                        MessageBox.Show("Error " + z);
-                    }
+                    #endregion Mostrar en dgvCed1
+                }
+                catch (Exception z)
+                {
+                    MessageBox.Show("Error " + z);
                 }
             }
         }

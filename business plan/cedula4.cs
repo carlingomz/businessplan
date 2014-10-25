@@ -17,9 +17,12 @@ namespace business_plan
     {
         #region variables conexion
         MySqlConnection Conn;
+        
         string query;
         MySqlCommand cmd;
         MySqlDataReader reader;
+       
+        // private string conexion = "SERVER=localhost; DATABASE=dwh; user=root; PASSWORD= ;";
         private string conexion = "SERVER=10.10.1.76; DATABASE=dwh; user=root; PASSWORD=zaptorre;";
         #endregion
         #region variables globales
@@ -29,20 +32,17 @@ namespace business_plan
         DateTime FechaAI = DateTime.Now;
         DateTime FechaAF = DateTime.Now;
         double margeninipor=0.0,margeniniImp=0.0,rebajaspor=0.0,rebajasimp=0.0,margenfinpor=0.0,margenfinImp=0.0,dppPor=0.0,dppImp=0.0,utilidadpor=0.0,utilidadImp=0.0;
-        string valor1 = "";
-        string valor2 = "";
-        string valor3 = "";
-        string valor4 = "";
-        string valor5 = "";
-        string valor6 = "";
-        string valor7 = "";
-        string valor8 = "";
-        string valor9 = "";
-        string valor10 = "";
-        string valor0 = "";
-        
-        int id = 0;
+      
+       
+        string fechainicialsuma = "";
+        string fechafinalsuma = "";
+        double gastototal = 0;
+        string ventatotal = "";
+        string gastotot = "";
+        string venta = "";
+         int id = 0;
         string idsucursal = "Total";
+        string divisiones = "";
         #endregion
         public cedula4()
         {
@@ -52,9 +52,13 @@ namespace business_plan
             try
             {
                 Conn.Open();
-            }
+              //  cmd.CommandType = CommandType.StoredProcedure;
+               // cmd.CommandTimeout = 0;
+             //   cmd.CommandTimeout(0);
+             }
             catch (MySqlException ex)
             {
+                
                 MessageBox.Show(ex.ToString());
             }
             #endregion
@@ -62,17 +66,18 @@ namespace business_plan
 
         private void btnSimular_Click(object sender, EventArgs e)
         {
-            try
+             try
             {
                 #region obtener Fecha anterior inicial
                 Fechainicial = dtpFechainicial.Text;
-                
                 query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechainicial + "';";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     FechaAI = DateTime.Parse(reader["FechaAnterior"].ToString());
+                    fechainicialsuma = Convert.ToString(FechaAI);
                 }
                 reader.Close();
                 #endregion
@@ -81,392 +86,94 @@ namespace business_plan
                 Fechafinal = dtpFechafinal.Text;
                 query = "SELECT FechaAnterior FROM fecha WHERE Fecha='" + Fechafinal + "';";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0; //posible solucion 
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     FechaAF = DateTime.Parse(reader["FechaAnterior"].ToString());
+                    fechafinalsuma = Convert.ToString(FechaAF);
+                    label9.Text = fechafinalsuma;
                 }
                 reader.Close();
                 #endregion
-            }
+
+                 
+                
+               }
             catch (Exception x)
             {
                 MessageBox.Show("Error con las fechas " + x);
             }
 
-            for (int i = 0; i <= dgvCed4.Rows.Count - 1; i++)
+             for (int i = 0; i <= dgvCed4.Rows.Count - 1; i++)//(int i = 0; i <= 20 - 1; i++) ///
             {
 
                 if (dgvCed4.Rows[i].Cells[0].Value != null)
                 {
+                    m_gastotot(fechainicialsuma, fechafinalsuma);///////////  
+                    m_ventatot(fechainicialsuma, fechafinalsuma);
+                    gastotot = gastototal.ToString();
+
+
                     if (cbEstructura2.Text == "Total")
                     {
                         #region query
-                        if (idsucursal == "Total")
+                        if (cbEstructura.Text == "Total")
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                             m_venta_suc("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                             query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                         }
                         else
-                        {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                        {  m_venta_suc("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE "+idsucursal+" AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " +  idsucursal+" AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                       
+                          }
                         #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            //dgvCed4.Rows[i].Cells[1].Value = reader["margeninipor"].ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = reader["margenfinpor"].ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = reader["margeninimp"].ToString();
-                            //dgvCed4.Rows[i].Cells[4].Value = reader["margenfinimp"].ToString();
-                            //dgvCed4.Rows[i].Cells[5].Value = reader["rebajasimp"].ToString();
-                            //dgvCed4.Rows[i].Cells[6].Value = reader["rebajaspor"].ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = reader["dpppor"].ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = reader["dppimp"].ToString();
-                            //dgvCed4.Rows[i].Cells[9].Value = reader["utilidadpor"].ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = reader["UTILIDADIMP"].ToString();
-                            if(reader["margeninipor"].ToString()!="")
-                            {
-                            margeninipor=double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else{margeninipor=0;}
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString()!="")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString()!="")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                        }
-                        reader.Close();
-
-                        #endregion
+                           m_llenardgv(query);
                     }
-                    else { }
-                    if (cbEstructura2.Text == "Sucursal")
-                    {
-                        #region query
-                        if (idsucursal == "Total")
-                        {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
-                        else
-                        {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE V.IDSUCURSAL=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
-                        }
-                        #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
-                    }
+      
                     else { }
                     if (cbEstructura2.Text == "Division")
                     {
-                        if (idsucursal == "Total")
+
+                           #region query
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND iddivisiones=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                             
+                                m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                                if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                                query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND iddivisiones= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            
                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND iddivisiones=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
-                            #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
+                              
+                                m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                                if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                                query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND iddivisiones= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            
                             }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
                         #endregion
-                    }
+                        m_llenardgv(query);  
+                     }
                     else { }
                     if (cbEstructura2.Text == "Departamento")
-                    {
-                        if (idsucursal == "Total")
+                    { 
+                        #region query
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND iddepto=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND iddepto= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                          }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE" + idsucursal + "AND iddepto=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND iddepto= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
-                            #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                            #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
@@ -474,96 +181,20 @@ namespace business_plan
                     {
 
                         #region query
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idfamilia=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idfamilia= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND idfamilia=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
-                        #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idfamilia= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                          }
+                        #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
@@ -571,97 +202,20 @@ namespace business_plan
                     {
 
                         #region query
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idlinea=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idlinea= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                          }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND idlinea=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
-                        }
-                        #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idlinea= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                          }
+                        #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
@@ -669,696 +223,166 @@ namespace business_plan
                     {
 
                         #region query
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl1=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl1= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND idl1=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl1= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                     
                         }
-                        #endregion
-                        #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                        #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 2")
+                    if (cbEstructura2.Text == "Linea 2")
                     {
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
                             #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl2=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl2= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                    
+                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND idl2=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl2= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                     
                         }
-                            #endregion
-                         #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                            #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 3")
+                    if (cbEstructura2.Text == "Linea 3")
                     {
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
                             #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl3=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl3= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                    
+                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND idl3=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl3= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                     
                         }
-                            #endregion
-                           #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                            #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 4")
+                    if (cbEstructura2.Text == "Linea 4")
                     {
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
                             #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl4=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl4= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl4=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl4= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                     
                         }
-                            #endregion
-                          #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                            #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 5")
+                    if (cbEstructura2.Text == "Linea 5")
                     {
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
                             #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl5=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl5= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE" + idsucursal + " AND idl5=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl5= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                             #endregion
-                           #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+ //
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Linea 6")
+                    if (cbEstructura2.Text == "Linea 6")
                     {
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
                             #region query
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl6=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                        }
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND idl6= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                    
+                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND idl6=" + idd[i] + "  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = " + idd[i] + " AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND idl6= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                     
                         }
                             #endregion
-                           #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+ 
+                        m_llenardgv(query);
                         reader.Close();
                     }
                     else { }
-                    if (cbEstructura.Text == "Marca")
+                    if (cbEstructura2.Text == "Marca")
                     {
 
                         #region query
-                        if (idsucursal == "Total")
+                        if (idsucursal == "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')")
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND marca = '" + idd[i] + "'  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')AND " + divisiones + " = '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08') AND marca= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
                         }
                         else
                         {
-                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp,((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor,(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp,(1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor,((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+400000)  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + " AND marca = '" + idd[i] + "'  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-
+                            m_venta("SELECT SUM(impllenototal) AS venta FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND " + divisiones + " = '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';");
+                            if (venta == "") { venta = "0"; } if (ventatotal == "") { ventatotal = "0"; }
+                            query = "SELECT (1 - SUM(costomargenneto) /((SUM(impllenototal))))*100 AS margeninipor, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS margenfinpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)))))*SUM(impllenototal) AS margeninimp, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal) AS margenfinimp, (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)) AS rebajasimp, ((SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))/SUM(impllenototal))*100  AS rebajaspor,SUM(impllenototal) AS venta,SUM(ctdneta) AS cantidad,(1 - (SUM(costomargenneto)+ " + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 AS dpppor, (1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + ")) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS dppimp, (1 - SUM(costomargenneto) /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100 - ((1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))*100) AS utilidadpor, ((1 - SUM(costomargenneto) /((SUM(impllenototal)-(SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva))))))*SUM(impllenototal)-(1 - (SUM(costomargenneto)+" + gastotot + "*(" + venta + "/" + ventatotal + "))  /((SUM(impllenototal)-  (SUM(rebajaregsiva)+SUM(rebajapromsiva)+SUM(rebajanormalsiva)+SUM(rebajadesctosiva)))))* SUM(impllenototal) AS UTILIDADIMP FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE " + idsucursal + "AND marca= '" + idd[i] + "' AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                     
                         }
-                        #endregion
-                         #region llenardgv
-                        cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            #region
-                            //margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            //margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            //margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            //margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            //rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            //rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            //dppPor = double.Parse(reader["dpppor"].ToString());
-                            //dppImp = double.Parse(reader["dppimp"].ToString());
-                            //utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            //utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            //dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                            //dgvCed4.Rows[i].Cells[2].Value = margenfinpor.ToString();
-                            //dgvCed4.Rows[i].Cells[3].Value = margeniniImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[4].Value = margenfinImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[5].Value = rebajasimp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[6].Value = rebajaspor.ToString();
-                            //dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                            //dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                            //dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                            //dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
-                            #endregion
-                            if (reader["margeninipor"].ToString() != "")
-                            {
-                                margeninipor = double.Parse(reader["margeninipor"].ToString());
-                            }
-                            else { margeninipor = 0; }
-                            if (reader["margenfinpor"].ToString() != "")
-                            {
-                                margenfinpor = double.Parse(reader["margenfinpor"].ToString());
-                            }
-                            else { margenfinpor = 0; }
-                            if (reader["margeninimp"].ToString() != "")
-                            {
-                                margeniniImp = double.Parse(reader["margeninimp"].ToString());
-                            }
-                            else { margeniniImp = 0; }
-                            if (reader["margenfinimp"].ToString() != "")
-                            {
-                                margenfinImp = double.Parse(reader["margenfinimp"].ToString());
-                            }
-                            else { margenfinImp = 0; }
-                            if (reader["rebajasimp"].ToString() != "")
-                            {
-                                rebajasimp = double.Parse(reader["rebajasimp"].ToString());
-                            }
-                            else { rebajasimp = 0; }
-                            if (reader["rebajaspor"].ToString() != "")
-                            {
-                                rebajaspor = double.Parse(reader["rebajaspor"].ToString());
-                            }
-                            else { rebajaspor = 0; }
-                            if (reader["dpppor"].ToString() != "")
-                            {
-                                dppPor = double.Parse(reader["dpppor"].ToString());
-                            }
-                            else { dppPor = 0; }
-                            if (reader["dppimp"].ToString() != "")
-                            {
-                                dppImp = double.Parse(reader["dppimp"].ToString());
-                            }
-                            else { dppImp = 0; }
-                            if (reader["utilidadpor"].ToString() != "")
-                            {
-                                utilidadpor = double.Parse(reader["utilidadpor"].ToString());
-                            }
-                            else { utilidadpor = 0; }
-                            if (reader["UTILIDADIMP"].ToString() != "")
-                            {
-                                utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
-                            }
-                            else { utilidadImp = 0; }
-                        }
-
-                        reader.Close();
-                        #endregion
+                        #endregion 
+                        m_llenardgv(query);
                         reader.Close();
                     }
-                    else { }
-                    dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString();
-                    dgvCed4.Rows[i].Cells[2].Value = margeniniImp.ToString("C2");
+                    else { } 
+                    dgvCed4.Rows[i].Cells[1].Value = margeninipor.ToString("N2");
+                    dgvCed4.Rows[i].Cells[2].Value = margeniniImp.ToString("C0");      ///margeniniImp
+                    dgvCed4.Rows[i].Cells[3].Value = rebajaspor.ToString("N2");//c2   rebajaspor
+                    dgvCed4.Rows[i].Cells[4].Value = rebajasimp.ToString("C0");//c2    rebajasimp
+                    dgvCed4.Rows[i].Cells[5].Value = margenfinpor.ToString("N2");         //margenfinpor
+                    dgvCed4.Rows[i].Cells[6].Value = margenfinImp.ToString("C0");//c2     margenfinImp
 
-                    dgvCed4.Rows[i].Cells[3].Value = rebajaspor.ToString();
-                    dgvCed4.Rows[i].Cells[4].Value = rebajasimp.ToString("C2");
-                    dgvCed4.Rows[i].Cells[5].Value = margenfinpor.ToString();
-
-                    dgvCed4.Rows[i].Cells[6].Value = margenfinImp.ToString("C2");
-                    
-                    dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString();
-                    dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C2");
-                    dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString();
-                    dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C2");
+                    dgvCed4.Rows[i].Cells[7].Value = dppPor.ToString("N2");//                       n2
+                    dgvCed4.Rows[i].Cells[8].Value = dppImp.ToString("C0");//c2
+                    dgvCed4.Rows[i].Cells[9].Value = utilidadpor.ToString("N2");//                     n2
+                    dgvCed4.Rows[i].Cells[10].Value = utilidadImp.ToString("C0");//c2
                 }
             }
         }
@@ -1372,35 +396,28 @@ namespace business_plan
             #endregion
         }
 
-        private void chbModificar_CheckedChanged(object sender, EventArgs e)
-        {
+      
 
-        }
-
-        private void cbEstructura_TextChanged(object sender, EventArgs e)
-        {
-            int i = 0;
+        private void cbEstructura_TextChanged(object sender, EventArgs e) /////ESTRUCT TOTAL, juarez, hidalgo,triana,lerdo,matriz
+        { 
             string SeleccionActual = cbEstructura.Text;
             switch (SeleccionActual)
             {
                 case "Total":
-                    idsucursal = "Total";
+                    idsucursal = "(V.IDSUCURSAL= '01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')";
                     break;
-                case "Sucursal Juarez":
-                    idsucursal = "(V.IDSUCURSAL='01')";
+                case "Juarez":
+                    idsucursal = "V.IDSUCURSAL='01' ";
                     break;
-
-                case "Sucursal Hidalgo":
-                    idsucursal = "(V.IDSUCURSAL='02')";
+                case "Hidalgo":
+                    idsucursal = "V.IDSUCURSAL='02' ";
                     break;
-                case "Sucursal Triana":
-                    idsucursal = "(V.IDSUCURSAL='06')";
+                case "Triana":
+                    idsucursal = "V.IDSUCURSAL='06' ";
                     break;
-                case "Sucursal Lerdo":
-                    idsucursal = "(V.IDSUCURSAL='07')";
-                    break;
-                case "Sucursal Matriz":
-                    idsucursal = "(V.IDSUCURSAL='08')";
+                
+                case "Matriz":
+                    idsucursal = "V.IDSUCURSAL='08' ";
                     break;
 
             }
@@ -1412,7 +429,10 @@ namespace business_plan
             dtpFechafinal.Value = DateTime.Now;
             dtpFechainicial.Value = DateTime.Now;
             tbEscenario.Clear();
+           // cbEstructura.Text = "";
+            //cbEstructura2.Text = "";
             dgvCed4.Rows.Clear();
+
         }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
@@ -1430,6 +450,7 @@ namespace business_plan
                 #region comprobar nombre
                 query = "SELECT Escenario from cedula4 where Escenario='" + tbEscenario.Text + "'";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
@@ -1464,6 +485,7 @@ namespace business_plan
                             #region actualizar
                             query = "UPDATE cedula4 SET margeniniPor=" +margeninipor.ToString()+ ",margeniniImp=" +margeniniImp+ ",rebajasPor=" +rebajaspor.ToString() + ",rebajasImp=" + rebajasimp.ToString() + ",margenfinPor=" + margenfinpor.ToString() + ",margenfinImp=" +margenfinImp.ToString()+ ",dppPor=" + dppPor.ToString() + ",dppImp=" +dppImp.ToString() + ",utilidadPor=" + utilidadpor.ToString() + ",utilidadImp=" + utilidadpor.ToString()+" where Escenario='" + tbEscenario.Text + "'";
                             cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;
                             cmd.ExecuteNonQuery();
                             #endregion
                         }
@@ -1496,6 +518,7 @@ namespace business_plan
                         #region insertar
                         query = "INSERT INTO  cedula4 (Escenario,margeniniPor,margeniniImp,rebajasPor,rebajasImp,margenfinPor,margenfinImp,dppPor,dppImp,utilidadPor,utilidadImp) VALUES('" + tbEscenario.Text + "'," + margeninipor.ToString() + "," + margeniniImp.ToString() + "," + rebajaspor.ToString() + "," + rebajasimp.ToString() + "," + margenfinpor.ToString() + "," + margenfinImp.ToString() + "," + dppPor.ToString() + "," + dppImp.ToString() + "," + utilidadpor.ToString() + "," + utilidadImp.ToString() + ")";
                         cmd = new MySqlCommand(query, Conn);
+                        cmd.CommandTimeout = 0;
                         cmd.ExecuteNonQuery();
                         #endregion
                     }
@@ -1512,6 +535,7 @@ namespace business_plan
             #region total
             if (SeleccionActual == "Total")
             {
+                divisiones = ""; 
                 dgvCed4.Rows.Clear();
                 dgvCed4.Rows.Add();
                 dgvCed4.Rows[0].Cells[0].Value = "Total";
@@ -1519,41 +543,28 @@ namespace business_plan
             else
             { }
             #endregion
-            #region sucursal
-            if (SeleccionActual == "Sucursal")
-            {
-                dgvCed4.Rows.Clear();
-                query = "SELECT distinct descrip,idsucursal from sucursal where visible='S';";
-                cmd = new MySqlCommand(query, Conn);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idsucursal"].ToString();
-                    i++;
-                }
-                reader.Close();
-            }
-            else
-            { }
-            #endregion
+           
             #region division
             if (SeleccionActual == "Division")
             {
+                divisiones = "iddivisiones";
                 dgvCed4.Rows.Clear();
-                query = "SELECT distinct descrip,iddivisiones from estdivisiones;";
+                query = "SELECT descrip,iddivisiones from estdivisiones;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["iddivisiones"].ToString();
-
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL")
+                    { }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["iddivisiones"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -1563,17 +574,24 @@ namespace business_plan
             #region Departamento
             if (SeleccionActual == "Departamento")
             {
+                divisiones = "iddepto";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,iddepto from estdepartamento;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["iddepto"].ToString();
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL")
+                    {  }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["iddepto"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -1583,18 +601,25 @@ namespace business_plan
             #region Familia
             if (SeleccionActual == "Familia")
             {
+                divisiones = "idfamilia";   
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idfamilia from estfamilia;";
                 cmd = new MySqlCommand(query, Conn);
+
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idfamilia"].ToString();
-
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL")
+                    { }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["idfamilia"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -1604,18 +629,24 @@ namespace business_plan
             #region Linea
             if (SeleccionActual == "Linea")
             {
+                divisiones = "idlinea";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idlinea from estlinea;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idlinea"].ToString();
-
-                    i++;
+                    string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL")
+                    {   }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["idlinea"].ToString();
+                        i++;
+                    }
                 }
                 reader.Close();
             }
@@ -1625,18 +656,25 @@ namespace business_plan
             #region linea 1
             if (SeleccionActual == "Linea 1")
             {
+                divisiones = "idl1";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl1 from estl1;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl1"].ToString();
+                    string ocultar = reader["descrip"].ToString();
+                    if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                    { }
+                    else
+                    {
+                        dgvCed4.Rows.Add();
+                        dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                        idd[i] = reader["idl1"].ToString();
+                        i++;
+                    }
 
-                    i++;
                 }
                 reader.Close();
             }
@@ -1646,18 +684,26 @@ namespace business_plan
             #region linea 2
             if (SeleccionActual == "Linea 2")
             {
+                divisiones = "idl2";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl2 from estl2;";
                 cmd = new MySqlCommand(query, Conn);
+
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl2"].ToString();
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl2"].ToString();
 
-                    i++;
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -1667,17 +713,23 @@ namespace business_plan
             #region linea 3
             if (SeleccionActual == "Linea 3")
             {
+                divisiones = "idl3";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl3 from estl3;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl3"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {    dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl3"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -1687,17 +739,25 @@ namespace business_plan
             #region linea 4
             if (SeleccionActual == "Linea 4")
             {
+                divisiones = "idl4";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl4 from estl4;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl4"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl4"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -1707,17 +767,24 @@ namespace business_plan
             #region linea 5
             if (SeleccionActual == "Linea 5")
             {
+                divisiones = "idl5";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip,idl5 from estl5;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl5"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl5"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -1727,17 +794,24 @@ namespace business_plan
             #region linea 6
             if (SeleccionActual == "Linea 6")
             {
+                divisiones = "idl6";
                 dgvCed4.Rows.Clear();
                 query = "SELECT distinct descrip, idl6 from estl6;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["idl6"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["idl6"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -1747,17 +821,24 @@ namespace business_plan
             #region Marca
             if (SeleccionActual == "Marca")
             {
+                divisiones = "marca";
                 dgvCed4.Rows.Clear();
                 query = "SELECT marca, descrip  from marca;";
                 cmd = new MySqlCommand(query, Conn);
+                cmd.CommandTimeout = 0;//pos solucion
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    //cbEstructura.Items.Add(reader["descrip"].ToString());
-                    dgvCed4.Rows.Add();
-                    dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
-                    idd[i] = reader["marca"].ToString();
-                    i++;
+                     string ocultar = reader["descrip"].ToString();
+                     if (ocultar == "GENERAL" || ocultar == "FIESTA")
+                     { }
+                     else
+                     {
+                         dgvCed4.Rows.Add();
+                         dgvCed4.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                         idd[i] = reader["marca"].ToString();
+                         i++;
+                     }
                 }
                 reader.Close();
             }
@@ -1766,29 +847,207 @@ namespace business_plan
             #endregion
         }
 
-        private void comboBox1_DropDown(object sender, EventArgs e)
+        
+
+        
+        private void m_gastotot(string fecha1, string fecha2)
         {
-            comboBox1.Items.Clear();
-            query = "SELECT * FROM cedula4;";
-            cmd = new MySqlCommand(query, Conn);
-                        reader = cmd.ExecuteReader();
-                        while (reader.Read())
+            string mes1 = Convert.ToString(fecha1.Substring(3, 2));
+            string mes2 = Convert.ToString(fecha2.Substring(3, 2));
+            string ano1 = Convert.ToString(fecha1.Substring(6, 4));
+            string ano2 = Convert.ToString(fecha2.Substring(6, 4));
+            int vmes1 = Convert.ToInt32(mes1);
+            int vmes2 = Convert.ToInt32(mes2);
+            int vano1 = Convert.ToInt32(ano1);
+            int vano2 = Convert.ToInt32(ano2);
+            gastototal = 0;
+
+            #region añomes
+            for (; vano1 <= vano2; vano1++)
+            {
+                if (vmes1 <= vmes2)
+                {
+                    for (; vmes1 <= vmes2; vmes1++)
+                        try
                         {
-                            comboBox1.Items.Add(reader["Escenario"].ToString());
+                            #region mes1 menor que mes2
+                            if (vmes1 == 10)
+                            {
+                                query = "SELECT gasto FROM gasto WHERE gasto.month = '10' AND gasto.year = '" + vano1 + "'";
+                            }
+                            else if (vmes1 == 11)
+                            {
+                                query = "SELECT gasto FROM gasto WHERE gasto.month = '11' AND gasto.year = '" + vano1 + "'";
+                            }
+                            else if (vmes1 == 12)
+                            {
+                                query = "SELECT gasto FROM gasto WHERE gasto.month = '12' AND gasto.year = '" + vano1 + "'";
+                            }
+                            else
+                            {
+                                query = "SELECT gasto FROM gasto WHERE gasto.month = '0" + vmes1 + "' AND gasto.year = '" + vano1 + "'";
+                            }
+                            cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;//pos solucion
+                            reader = cmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                double gasto = Convert.ToDouble(reader["gasto"]);
+                                gastototal = gastototal + gasto;
+                            }
+                            reader.Close();
+                            #endregion
+
                         }
-                        reader.Close();
+                        catch (Exception x)
+                        {
+                            MessageBox.Show("Error con las fechas " + x);
+                        }
+                }
+                else if (vmes2 < vmes1)
+                {
+                    for (; vmes1 <= 12; vmes1++)
+                        try
+                        {
+                            #region mes2 menor que mes1
+                            query = "SELECT * FROM gasto WHERE gasto.month = '" + mes1 + "' AND gasto.year = '" + vano1 + "'";
+                            cmd = new MySqlCommand(query, Conn);
+                            cmd.CommandTimeout = 0;//pos solucion
+                            reader = cmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                double gasto = Convert.ToDouble(reader["gasto"]);
+                                gastototal = gastototal + gasto;
+
+                            }
+                            reader.Close();
+                            #endregion
+                        }
+                        catch (Exception x)
+                        {
+                            MessageBox.Show("Error con las fechas " + x);
+                        }
+                }
+                vmes1 = 1;
+            }
+            #endregion
+
         }
 
-        private void comboBox1_TextChanged(object sender, EventArgs e)
+     
+
+        private void m_venta_suc(string queryventa)
         {
-            //int i=0;
-            //query = "SELECT * FROM cedula4 WHERE Escenario='"+comboBox1.Text+"';";
-            //cmd = new MySqlCommand(query, Conn);
-            //            reader = cmd.ExecuteReader();
-            //            while (reader.Read())
-            //            {
-            //                dgvCed4.Rows[].Cells[].Value=;
-            //            }
-        }  
+            query = queryventa;
+            cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                venta = reader["venta"].ToString();
+            }
+            reader.Close();
+        
+        }
+
+        private void m_ventatot(string fecha1, string fecha2)
+        {
+
+            string f1 = Convert.ToString(fecha1.Substring(6, 4)) + "-" + Convert.ToString(fecha1.Substring(3, 2)) + "-" + Convert.ToString(fecha1.Substring(0, 2));
+            string f2 = Convert.ToString(fecha2.Substring(6, 4)) + "-" + Convert.ToString(fecha2.Substring(3, 2)) + "-" + Convert.ToString(fecha2.Substring(0, 2));
+            query = "SELECT SUM(impneto) AS ventatot,SUM(ctdneta) AS cantidadtot FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + f1 + " 'AND' " + f2 + "'"; ;
+            cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                ventatotal = reader["ventatot"].ToString();
+            }
+            reader.Close();
+
+
+        }
+
+        private void m_venta(string queryventa)
+        {
+            query = queryventa;
+            cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
+            reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                venta = reader["venta"].ToString();
+            }
+            reader.Close();
+
+        }
+
+        public void m_llenardgv(string query)
+        { 
+#region llenardgv
+            cmd = new MySqlCommand(query, Conn);
+            cmd.CommandTimeout = 0;//pos solucion
+            
+                reader = cmd.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                    if (reader["margeninipor"].ToString() != "")
+                    {
+                        margeninipor = double.Parse(reader["margeninipor"].ToString());
+                    }
+                    else { margeninipor = 0; }
+                    if (reader["margenfinpor"].ToString() != "")
+                    {
+                        margenfinpor = double.Parse(reader["margenfinpor"].ToString());
+                    }
+                    else { margenfinpor = 0; }
+                    if (reader["margeninimp"].ToString() != "")
+                    {
+                        margeniniImp = double.Parse(reader["margeninimp"].ToString());
+                    }
+                    else { margeniniImp = 0; }
+                    if (reader["margenfinimp"].ToString() != "")
+                    {
+                        margenfinImp = double.Parse(reader["margenfinimp"].ToString());
+                    }
+                    else { margenfinImp = 0; }
+                    if (reader["rebajasimp"].ToString() != "")
+                    {
+                        rebajasimp = double.Parse(reader["rebajasimp"].ToString());
+                    }
+                    else { rebajasimp = 0; }
+                    if (reader["rebajaspor"].ToString() != "")
+                    {
+                        rebajaspor = double.Parse(reader["rebajaspor"].ToString());
+                    }
+                    else { rebajaspor = 0; }
+                    if (reader["dpppor"].ToString() != "")
+                    {
+                        dppPor = double.Parse(reader["dpppor"].ToString());
+                    }
+                    else { dppPor = 0; }
+                    if (reader["dppimp"].ToString() != "")
+                    {
+                        dppImp = double.Parse(reader["dppimp"].ToString());
+                    }
+                    else { dppImp = 0; }
+                    if (reader["utilidadpor"].ToString() != "")
+                    {
+                        utilidadpor = double.Parse(reader["utilidadpor"].ToString());
+                    }
+                    else { utilidadpor = 0; }
+                    if (reader["UTILIDADIMP"].ToString() != "")
+                    {
+                        utilidadImp = double.Parse(reader["UTILIDADIMP"].ToString());
+                    }
+                    else { utilidadImp = 0; }
+                }
+                reader.Close();
+            
+                        #endregion
+
+
+        }
     }
 }

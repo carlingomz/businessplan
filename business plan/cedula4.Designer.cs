@@ -55,14 +55,13 @@
             this.Column18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label9 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.cbEstructura2 = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.cbEstructura = new System.Windows.Forms.ComboBox();
-            this.cbModificar = new System.Windows.Forms.ComboBox();
-            this.chbModificar = new System.Windows.Forms.CheckBox();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.dtpFechafinal = new System.Windows.Forms.DateTimePicker();
             this.tbEscenario = new System.Windows.Forms.TextBox();
@@ -127,9 +126,9 @@
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label6.Location = new System.Drawing.Point(0, 90);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(341, 39);
+            this.label6.Size = new System.Drawing.Size(88, 39);
             this.label6.TabIndex = 7;
-            this.label6.Text = "Pronostico de ventas";
+            this.label6.Text = "DPP";
             // 
             // label4
             // 
@@ -184,7 +183,7 @@
             this.tabControl1.Location = new System.Drawing.Point(0, 184);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1218, 467);
+            this.tabControl1.Size = new System.Drawing.Size(1218, 480);
             this.tabControl1.TabIndex = 5;
             // 
             // tabPage1
@@ -194,7 +193,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1210, 441);
+            this.tabPage1.Size = new System.Drawing.Size(1210, 454);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Simulador";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -203,9 +202,9 @@
             // 
             this.panel3.Controls.Add(this.dgvCed4);
             this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(3, 100);
+            this.panel3.Location = new System.Drawing.Point(3, 89);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1204, 338);
+            this.panel3.Size = new System.Drawing.Size(1204, 362);
             this.panel3.TabIndex = 6;
             // 
             // dgvCed4
@@ -240,10 +239,9 @@
             dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvCed4.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dgvCed4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvCed4.Location = new System.Drawing.Point(0, 0);
+            this.dgvCed4.Location = new System.Drawing.Point(0, 1);
             this.dgvCed4.Name = "dgvCed4";
-            this.dgvCed4.Size = new System.Drawing.Size(1204, 338);
+            this.dgvCed4.Size = new System.Drawing.Size(1204, 316);
             this.dgvCed4.TabIndex = 0;
             // 
             // Column23
@@ -319,14 +317,13 @@
             // panel1
             // 
             this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.label9);
             this.panel1.Controls.Add(this.label7);
             this.panel1.Controls.Add(this.cbEstructura2);
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.btnNuevo);
             this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.cbEstructura);
-            this.panel1.Controls.Add(this.cbModificar);
-            this.panel1.Controls.Add(this.chbModificar);
             this.panel1.Controls.Add(this.btnGuardar);
             this.panel1.Controls.Add(this.dtpFechafinal);
             this.panel1.Controls.Add(this.tbEscenario);
@@ -339,8 +336,17 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1204, 97);
+            this.panel1.Size = new System.Drawing.Size(1204, 86);
             this.panel1.TabIndex = 5;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(451, 67);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(37, 13);
+            this.label9.TabIndex = 20;
+            this.label9.Text = "Fecha";
             // 
             // label7
             // 
@@ -407,38 +413,16 @@
             this.cbEstructura.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbEstructura.FormattingEnabled = true;
             this.cbEstructura.Items.AddRange(new object[] {
-            "Total ",
+            "Total",
             "Juarez",
             "Hidalgo",
             "Triana",
             "Matriz"});
-            this.cbEstructura.Location = new System.Drawing.Point(17, 41);
+            this.cbEstructura.Location = new System.Drawing.Point(18, 41);
             this.cbEstructura.Name = "cbEstructura";
             this.cbEstructura.Size = new System.Drawing.Size(172, 21);
             this.cbEstructura.TabIndex = 12;
             this.cbEstructura.TextChanged += new System.EventHandler(this.cbEstructura_TextChanged);
-            // 
-            // cbModificar
-            // 
-            this.cbModificar.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbModificar.FormattingEnabled = true;
-            this.cbModificar.Location = new System.Drawing.Point(92, 73);
-            this.cbModificar.Name = "cbModificar";
-            this.cbModificar.Size = new System.Drawing.Size(212, 21);
-            this.cbModificar.TabIndex = 11;
-            this.cbModificar.Visible = false;
-            // 
-            // chbModificar
-            // 
-            this.chbModificar.AutoSize = true;
-            this.chbModificar.Location = new System.Drawing.Point(17, 75);
-            this.chbModificar.Name = "chbModificar";
-            this.chbModificar.Size = new System.Drawing.Size(69, 17);
-            this.chbModificar.TabIndex = 10;
-            this.chbModificar.Text = "Modificar";
-            this.chbModificar.UseVisualStyleBackColor = true;
-            this.chbModificar.Visible = false;
-            this.chbModificar.CheckedChanged += new System.EventHandler(this.chbModificar_CheckedChanged);
             // 
             // btnGuardar
             // 
@@ -533,7 +517,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1210, 441);
+            this.tabPage2.Size = new System.Drawing.Size(1210, 454);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Reportes";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -565,14 +549,12 @@
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(251, 21);
             this.comboBox1.TabIndex = 2;
-            this.comboBox1.DropDown += new System.EventHandler(this.comboBox1_DropDown);
-            this.comboBox1.TextChanged += new System.EventHandler(this.comboBox1_TextChanged);
             // 
             // panel2
             // 
             this.panel2.Controls.Add(this.dataGridView1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(3, 100);
+            this.panel2.Location = new System.Drawing.Point(3, 113);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(1204, 338);
             this.panel2.TabIndex = 1;
@@ -690,16 +672,16 @@
             this.foot.Controls.Add(this.btnCerrar);
             this.foot.Controls.Add(this.pictureBox3);
             this.foot.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.foot.Location = new System.Drawing.Point(0, 602);
+            this.foot.Location = new System.Drawing.Point(0, 615);
             this.foot.Name = "foot";
             this.foot.Size = new System.Drawing.Size(1218, 49);
             this.foot.TabIndex = 6;
             // 
             // btnCerrar
             // 
-            this.btnCerrar.Location = new System.Drawing.Point(590, 2);
+            this.btnCerrar.Location = new System.Drawing.Point(590, 15);
             this.btnCerrar.Name = "btnCerrar";
-            this.btnCerrar.Size = new System.Drawing.Size(75, 47);
+            this.btnCerrar.Size = new System.Drawing.Size(75, 34);
             this.btnCerrar.TabIndex = 3;
             this.btnCerrar.Text = "Cerrar";
             this.btnCerrar.UseVisualStyleBackColor = true;
@@ -708,9 +690,9 @@
             // 
             this.pictureBox3.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pictureBox3.Location = new System.Drawing.Point(0, -5);
+            this.pictureBox3.Location = new System.Drawing.Point(0, 15);
             this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(1218, 54);
+            this.pictureBox3.Size = new System.Drawing.Size(1218, 34);
             this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox3.TabIndex = 2;
             this.pictureBox3.TabStop = false;
@@ -719,7 +701,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1218, 651);
+            this.ClientSize = new System.Drawing.Size(1218, 664);
             this.Controls.Add(this.foot);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.PanelHeader);
@@ -764,8 +746,6 @@
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cbEstructura;
-        private System.Windows.Forms.ComboBox cbModificar;
-        private System.Windows.Forms.CheckBox chbModificar;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.DateTimePicker dtpFechafinal;
         private System.Windows.Forms.TextBox tbEscenario;
@@ -808,5 +788,6 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
+        private System.Windows.Forms.Label label9;
     }
 }

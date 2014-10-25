@@ -1,86 +1,11 @@
 ﻿namespace business_plan
 {
-    partial class Cedula_2
+    partial class cedula6
     {
-
-        private System.Windows.Forms.Button btnGuardar;
-
-        private System.Windows.Forms.Button btnNuevo;
-
-        private System.Windows.Forms.Button btnSimular;
-
-        private System.Windows.Forms.Button button1;
-
-        private System.Windows.Forms.ComboBox cbEscenarios;
-
-        private System.Windows.Forms.ComboBox cbEstructura;
-
-        private System.Windows.Forms.ComboBox cbEstructura2;
-
-        private System.Windows.Forms.ComboBox cbModificar;
-
-        private System.Windows.Forms.ComboBox cbRepo;
-
-        private System.Windows.Forms.CheckBox chbModificar;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
-
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
-
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
-        private System.Windows.Forms.DataGridView dgvCed2;
-
-        private System.Windows.Forms.DataGridView dgvCed2Rep;
-
-        private System.Windows.Forms.Label label1;
-
-        private System.Windows.Forms.Label label2;
-
-        private System.Windows.Forms.Label label3;
-
-        private System.Windows.Forms.Label label4;
-
-        private System.Windows.Forms.Label label5;
-
-        private System.Windows.Forms.Label label6;
-
-        private System.Windows.Forms.Label label8;
-
-        private System.Windows.Forms.Panel panel1;
-
-        private System.Windows.Forms.Panel panel2;
-
-        private System.Windows.Forms.Panel panel3;
-
-        private System.Windows.Forms.Panel panel4;
-
-        private System.Windows.Forms.Panel PanelHeader;
-
-        private System.Windows.Forms.ProgressBar progressBarCed1;
-
-        private System.Windows.Forms.TabControl tabControl1;
-
-        private System.Windows.Forms.TabPage tabPage1;
-
-        private System.Windows.Forms.TabPage tabPage2;
-
-        private System.Windows.Forms.TextBox tbNombre;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -103,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Cedula_2));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(cedula6));
             this.PanelHeader = new System.Windows.Forms.Panel();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.progressBarCed1 = new System.Windows.Forms.ProgressBar();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel3 = new System.Windows.Forms.Panel();
+            this.btnCerrar = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.dgvCed2 = new System.Windows.Forms.DataGridView();
@@ -125,13 +50,11 @@
             this.cbModificar = new System.Windows.Forms.ComboBox();
             this.chbModificar = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.cbEstructura = new System.Windows.Forms.ComboBox();
             this.tbNombre = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnNuevo = new System.Windows.Forms.Button();
-            this.cbEscenarios = new System.Windows.Forms.ComboBox();
             this.btnSimular = new System.Windows.Forms.Button();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel4 = new System.Windows.Forms.Panel();
@@ -143,14 +66,10 @@
             this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.btnCerrar = new System.Windows.Forms.Button();
-            this.panelFoot = new System.Windows.Forms.Panel();
             this.PanelHeader.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
-            this.panel1.SuspendLayout();
-            this.panel3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCed2)).BeginInit();
@@ -158,8 +77,6 @@
             this.tabPage2.SuspendLayout();
             this.panel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCed2Rep)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.panelFoot.SuspendLayout();
             this.SuspendLayout();
             // 
             // PanelHeader
@@ -172,8 +89,8 @@
             this.PanelHeader.Dock = System.Windows.Forms.DockStyle.Top;
             this.PanelHeader.Location = new System.Drawing.Point(0, 0);
             this.PanelHeader.Name = "PanelHeader";
-            this.PanelHeader.Size = new System.Drawing.Size(1056, 184);
-            this.PanelHeader.TabIndex = 2;
+            this.PanelHeader.Size = new System.Drawing.Size(1228, 184);
+            this.PanelHeader.TabIndex = 3;
             // 
             // pictureBox2
             // 
@@ -181,7 +98,7 @@
             this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
             this.pictureBox2.Location = new System.Drawing.Point(0, 135);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(1056, 49);
+            this.pictureBox2.Size = new System.Drawing.Size(1228, 49);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 9;
             this.pictureBox2.TabStop = false;
@@ -192,11 +109,10 @@
             this.pictureBox4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox4.Image")));
             this.pictureBox4.Location = new System.Drawing.Point(0, 0);
             this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(1056, 85);
+            this.pictureBox4.Size = new System.Drawing.Size(1228, 85);
             this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox4.TabIndex = 8;
             this.pictureBox4.TabStop = false;
-            this.pictureBox4.DoubleClick += new System.EventHandler(this.pictureBox4_DoubleClick);
             // 
             // label6
             // 
@@ -214,7 +130,7 @@
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(437, 93);
+            this.label4.Location = new System.Drawing.Point(523, 93);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(237, 39);
             this.label4.TabIndex = 5;
@@ -231,43 +147,47 @@
             this.progressBarCed1.TabIndex = 2;
             this.progressBarCed1.Visible = false;
             // 
-            // panel1
+            // btnCerrar
             // 
-            this.panel1.Controls.Add(this.panel3);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(0, 184);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1056, 343);
-            this.panel1.TabIndex = 4;
+            this.btnCerrar.AutoSize = true;
+            this.btnCerrar.Location = new System.Drawing.Point(570, 334);
+            this.btnCerrar.Name = "btnCerrar";
+            this.btnCerrar.Size = new System.Drawing.Size(75, 23);
+            this.btnCerrar.TabIndex = 7;
+            this.btnCerrar.Text = "Cerrar";
+            this.btnCerrar.UseVisualStyleBackColor = true;
             // 
-            // panel3
+            // pictureBox1
             // 
-            this.panel3.Controls.Add(this.tabControl1);
-            this.panel3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel3.Location = new System.Drawing.Point(0, 0);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(1056, 343);
-            this.panel3.TabIndex = 2;
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(0, 514);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(1228, 61);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 8;
+            this.pictureBox1.TabStop = false;
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Location = new System.Drawing.Point(0, 184);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1056, 343);
-            this.tabControl1.TabIndex = 1;
+            this.tabControl1.Size = new System.Drawing.Size(1228, 391);
+            this.tabControl1.TabIndex = 6;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnCerrar);
             this.tabPage1.Controls.Add(this.dgvCed2);
             this.tabPage1.Controls.Add(this.panel2);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1048, 317);
+            this.tabPage1.Size = new System.Drawing.Size(1220, 365);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Captura";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -284,12 +204,8 @@
             this.dgvCed2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvCed2.Location = new System.Drawing.Point(3, 110);
             this.dgvCed2.Name = "dgvCed2";
-            this.dgvCed2.Size = new System.Drawing.Size(1042, 204);
+            this.dgvCed2.Size = new System.Drawing.Size(1214, 252);
             this.dgvCed2.TabIndex = 0;
-            this.dgvCed2.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCed2_CellContentClick);
-            this.dgvCed2.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvCed2_CellValidating);
-            this.dgvCed2.RowLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCed2_RowLeave);
-            this.dgvCed2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.dgvCed2_KeyPress);
             // 
             // Column1
             // 
@@ -301,20 +217,21 @@
             // Column2
             // 
             this.Column2.Frozen = true;
-            this.Column2.HeaderText = "% de asignacion";
+            this.Column2.HeaderText = "Utilidad de producto % importe";
             this.Column2.Name = "Column2";
+            this.Column2.ReadOnly = true;
             // 
             // Column3
             // 
             this.Column3.Frozen = true;
-            this.Column3.HeaderText = "Asignacion de unidades";
+            this.Column3.HeaderText = "Utilidad de financiamiento % importe";
             this.Column3.Name = "Column3";
             this.Column3.ReadOnly = true;
             // 
             // Column4
             // 
             this.Column4.Frozen = true;
-            this.Column4.HeaderText = "Asignacion de importe";
+            this.Column4.HeaderText = "Utilidad con dias financiados";
             this.Column4.Name = "Column4";
             this.Column4.ReadOnly = true;
             // 
@@ -325,20 +242,17 @@
             this.panel2.Controls.Add(this.cbModificar);
             this.panel2.Controls.Add(this.chbModificar);
             this.panel2.Controls.Add(this.label5);
-            this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.cbEstructura);
             this.panel2.Controls.Add(this.tbNombre);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.btnGuardar);
             this.panel2.Controls.Add(this.btnNuevo);
-            this.panel2.Controls.Add(this.cbEscenarios);
             this.panel2.Controls.Add(this.btnSimular);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel2.Location = new System.Drawing.Point(3, 3);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1042, 107);
+            this.panel2.Size = new System.Drawing.Size(1214, 107);
             this.panel2.TabIndex = 1;
-            this.panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.panel2_Paint);
             // 
             // cbEstructura2
             // 
@@ -381,7 +295,6 @@
             this.cbModificar.Size = new System.Drawing.Size(212, 21);
             this.cbModificar.TabIndex = 13;
             this.cbModificar.Visible = false;
-            this.cbModificar.TextChanged += new System.EventHandler(this.cbModificar_TextChanged);
             // 
             // chbModificar
             // 
@@ -392,7 +305,6 @@
             this.chbModificar.TabIndex = 12;
             this.chbModificar.Text = "Modificar";
             this.chbModificar.UseVisualStyleBackColor = true;
-            this.chbModificar.CheckedChanged += new System.EventHandler(this.chbModificar_CheckedChanged);
             // 
             // label5
             // 
@@ -402,15 +314,6 @@
             this.label5.Size = new System.Drawing.Size(59, 13);
             this.label5.TabIndex = 9;
             this.label5.Text = "Sucursales";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(424, 20);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(54, 13);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "Escenario";
             // 
             // cbEstructura
             // 
@@ -454,7 +357,6 @@
             this.btnGuardar.TabIndex = 3;
             this.btnGuardar.Text = "Guardar";
             this.btnGuardar.UseVisualStyleBackColor = true;
-            this.btnGuardar.Click += new System.EventHandler(this.btnGuardar_Click);
             // 
             // btnNuevo
             // 
@@ -464,18 +366,6 @@
             this.btnNuevo.TabIndex = 2;
             this.btnNuevo.Text = "Nuevo";
             this.btnNuevo.UseVisualStyleBackColor = true;
-            this.btnNuevo.Click += new System.EventHandler(this.btnNuevo_Click);
-            // 
-            // cbEscenarios
-            // 
-            this.cbEscenarios.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbEscenarios.FormattingEnabled = true;
-            this.cbEscenarios.Location = new System.Drawing.Point(373, 36);
-            this.cbEscenarios.Name = "cbEscenarios";
-            this.cbEscenarios.Size = new System.Drawing.Size(145, 21);
-            this.cbEscenarios.TabIndex = 1;
-            this.cbEscenarios.DropDown += new System.EventHandler(this.cbEscenarios_DropDown);
-            this.cbEscenarios.TextChanged += new System.EventHandler(this.cbEscenarios_TextChanged);
             // 
             // btnSimular
             // 
@@ -485,7 +375,6 @@
             this.btnSimular.TabIndex = 0;
             this.btnSimular.Text = "Simular";
             this.btnSimular.UseVisualStyleBackColor = true;
-            this.btnSimular.Click += new System.EventHandler(this.btnSimular_Click);
             // 
             // tabPage2
             // 
@@ -494,7 +383,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1046, 317);
+            this.tabPage2.Size = new System.Drawing.Size(1220, 365);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Reporte";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -507,7 +396,7 @@
             this.panel4.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel4.Location = new System.Drawing.Point(3, 3);
             this.panel4.Name = "panel4";
-            this.panel4.Size = new System.Drawing.Size(1040, 66);
+            this.panel4.Size = new System.Drawing.Size(1214, 66);
             this.panel4.TabIndex = 3;
             // 
             // button1
@@ -519,7 +408,6 @@
             this.button1.TabIndex = 9;
             this.button1.Text = "Exportar a Excel";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // label2
             // 
@@ -540,8 +428,6 @@
             this.cbRepo.Name = "cbRepo";
             this.cbRepo.Size = new System.Drawing.Size(145, 21);
             this.cbRepo.TabIndex = 2;
-            this.cbRepo.DropDown += new System.EventHandler(this.cbRepo_DropDown);
-            this.cbRepo.TextChanged += new System.EventHandler(this.cbRepo_TextChanged);
             // 
             // dgvCed2Rep
             // 
@@ -580,59 +466,25 @@
             this.Column8.Name = "Column8";
             this.Column8.ReadOnly = true;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(0, -13);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1056, 61);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
-            // 
-            // btnCerrar
-            // 
-            this.btnCerrar.AutoSize = true;
-            this.btnCerrar.Location = new System.Drawing.Point(483, 13);
-            this.btnCerrar.Name = "btnCerrar";
-            this.btnCerrar.Size = new System.Drawing.Size(75, 23);
-            this.btnCerrar.TabIndex = 4;
-            this.btnCerrar.Text = "Cerrar";
-            this.btnCerrar.UseVisualStyleBackColor = true;
-            this.btnCerrar.Click += new System.EventHandler(this.btnCerrar_Click);
-            // 
-            // panelFoot
-            // 
-            this.panelFoot.Controls.Add(this.btnCerrar);
-            this.panelFoot.Controls.Add(this.pictureBox1);
-            this.panelFoot.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelFoot.Location = new System.Drawing.Point(0, 527);
-            this.panelFoot.Name = "panelFoot";
-            this.panelFoot.Size = new System.Drawing.Size(1056, 48);
-            this.panelFoot.TabIndex = 3;
-            // 
-            // Cedula_2
+            // cedula6
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1056, 575);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.panelFoot);
+            this.ClientSize = new System.Drawing.Size(1228, 575);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.PanelHeader);
-            this.Name = "Cedula_2";
-            this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Cedula 2";
-            this.Load += new System.EventHandler(this.Cedula_2_Load);
+            this.Name = "cedula6";
+            this.Text = "cedula6";
+            this.Load += new System.EventHandler(this.cedula6_Load);
             this.PanelHeader.ResumeLayout(false);
             this.PanelHeader.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
-            this.panel1.ResumeLayout(false);
-            this.panel3.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCed2)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
@@ -640,19 +492,48 @@
             this.panel4.ResumeLayout(false);
             this.panel4.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvCed2Rep)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.panelFoot.ResumeLayout(false);
-            this.panelFoot.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.Panel PanelHeader;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ProgressBar progressBarCed1;
         private System.Windows.Forms.Button btnCerrar;
-        private System.Windows.Forms.Panel panelFoot;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.DataGridView dgvCed2;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ComboBox cbEstructura2;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox cbModificar;
+        private System.Windows.Forms.CheckBox chbModificar;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ComboBox cbEstructura;
+        private System.Windows.Forms.TextBox tbNombre;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button btnGuardar;
+        private System.Windows.Forms.Button btnNuevo;
+        private System.Windows.Forms.Button btnSimular;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.Panel panel4;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox cbRepo;
+        private System.Windows.Forms.DataGridView dgvCed2Rep;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column7;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column8;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
     }
 }

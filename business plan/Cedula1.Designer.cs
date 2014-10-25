@@ -52,17 +52,6 @@
             this.btnCerrar = new System.Windows.Forms.Button();
             this.btnSimular = new System.Windows.Forms.Button();
             this.dgvCed1 = new System.Windows.Forms.DataGridView();
-            this.Column23 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column17 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column20 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.panel3 = new System.Windows.Forms.Panel();
@@ -100,6 +89,17 @@
             this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Pp = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Pvpu = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column23 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column17 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column18 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column19 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column20 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.PanelHeader.SuspendLayout();
@@ -283,6 +283,7 @@
             this.btnSimular.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
             this.btnSimular.Location = new System.Drawing.Point(979, 54);
             this.btnSimular.Name = "btnSimular";
+            this.btnSimular.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.btnSimular.Size = new System.Drawing.Size(110, 28);
             this.btnSimular.TabIndex = 4;
             this.btnSimular.Text = "Simular";
@@ -327,71 +328,6 @@
             this.dgvCed1.Size = new System.Drawing.Size(1230, 281);
             this.dgvCed1.TabIndex = 0;
             this.dgvCed1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.dgvCed1_KeyPress);
-            // 
-            // Column23
-            // 
-            this.Column23.Frozen = true;
-            this.Column23.HeaderText = "Categoria";
-            this.Column23.Name = "Column23";
-            this.Column23.ReadOnly = true;
-            // 
-            // Column11
-            // 
-            this.Column11.Frozen = true;
-            this.Column11.HeaderText = "Nivel de inventario deaseado";
-            this.Column11.Name = "Column11";
-            // 
-            // Column12
-            // 
-            this.Column12.Frozen = true;
-            this.Column12.HeaderText = "Rotacion de inventario deseada ";
-            this.Column12.Name = "Column12";
-            // 
-            // Column13
-            // 
-            this.Column13.HeaderText = "Venta total importe";
-            this.Column13.Name = "Column13";
-            this.Column13.ReadOnly = true;
-            // 
-            // Column14
-            // 
-            this.Column14.HeaderText = "Pronostico de pares";
-            this.Column14.Name = "Column14";
-            this.Column14.ReadOnly = true;
-            // 
-            // Column15
-            // 
-            this.Column15.HeaderText = "Precio de venta promedio unitario";
-            this.Column15.Name = "Column15";
-            this.Column15.ReadOnly = true;
-            // 
-            // Column16
-            // 
-            this.Column16.HeaderText = "Venta mensual pares";
-            this.Column16.Name = "Column16";
-            this.Column16.ReadOnly = true;
-            // 
-            // Column17
-            // 
-            this.Column17.HeaderText = "Venta mensual importe";
-            this.Column17.Name = "Column17";
-            this.Column17.ReadOnly = true;
-            // 
-            // Column18
-            // 
-            this.Column18.HeaderText = "Venta diaria pares";
-            this.Column18.Name = "Column18";
-            this.Column18.ReadOnly = true;
-            // 
-            // Column19
-            // 
-            this.Column19.HeaderText = "Venta diaria importe";
-            this.Column19.Name = "Column19";
-            // 
-            // Column20
-            // 
-            this.Column20.HeaderText = "Dias de inventario";
-            this.Column20.Name = "Column20";
             // 
             // tabControl1
             // 
@@ -767,6 +703,70 @@
             this.Pvpu.Name = "Pvpu";
             this.Pvpu.ReadOnly = true;
             // 
+            // Column23
+            // 
+            this.Column23.Frozen = true;
+            this.Column23.HeaderText = "Categoria";
+            this.Column23.Name = "Column23";
+            this.Column23.ReadOnly = true;
+            // 
+            // Column11
+            // 
+            this.Column11.Frozen = true;
+            this.Column11.HeaderText = "Nivel de inventario deaseado";
+            this.Column11.Name = "Column11";
+            // 
+            // Column12
+            // 
+            this.Column12.Frozen = true;
+            this.Column12.HeaderText = "Rotacion de inventario deseada ";
+            this.Column12.Name = "Column12";
+            // 
+            // Column13
+            // 
+            this.Column13.HeaderText = "Venta total importe";
+            this.Column13.Name = "Column13";
+            // 
+            // Column14
+            // 
+            this.Column14.HeaderText = "Pronostico de pares";
+            this.Column14.Name = "Column14";
+            this.Column14.ReadOnly = true;
+            // 
+            // Column15
+            // 
+            this.Column15.HeaderText = "Precio de venta promedio unitario";
+            this.Column15.Name = "Column15";
+            this.Column15.ReadOnly = true;
+            // 
+            // Column16
+            // 
+            this.Column16.HeaderText = "Venta mensual pares";
+            this.Column16.Name = "Column16";
+            this.Column16.ReadOnly = true;
+            // 
+            // Column17
+            // 
+            this.Column17.HeaderText = "Venta mensual importe";
+            this.Column17.Name = "Column17";
+            this.Column17.ReadOnly = true;
+            // 
+            // Column18
+            // 
+            this.Column18.HeaderText = "Venta diaria pares";
+            this.Column18.Name = "Column18";
+            this.Column18.ReadOnly = true;
+            // 
+            // Column19
+            // 
+            this.Column19.HeaderText = "Venta diaria importe";
+            this.Column19.Name = "Column19";
+            // 
+            // Column20
+            // 
+            this.Column20.HeaderText = "Dias de inventario";
+            this.Column20.Name = "Column20";
+            // 
             // Cedula1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -845,17 +845,6 @@
         private System.Windows.Forms.TextBox tbInflacion;
         private System.Windows.Forms.Button btnCerrar;
         private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column23;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column17;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column20;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column22;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
@@ -870,5 +859,16 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ComboBox cbEstructura2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column23;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column17;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column20;
     }
 }
