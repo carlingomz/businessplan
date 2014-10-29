@@ -1179,11 +1179,17 @@ namespace business_plan
 
         private void Cedula_2_Load(object sender, EventArgs e)
         {
-            //dgvCed2.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
-            dgvCed2.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#2882ff");
+            //dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
+            dgvCed2.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#B4FF8F");
             //dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#9DC1C1");
-            dgvCed2.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#abcdef");
+            dgvCed2.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#33D633");
             dgvCed2.CellBorderStyle = DataGridViewCellBorderStyle.None;
+
+            //dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
+            dgvCed2Rep.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#B4FF8F");
+            //dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#9DC1C1");
+            dgvCed2Rep.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#33D633");
+            dgvCed2Rep.CellBorderStyle = DataGridViewCellBorderStyle.None;
 
             #region cargar cbescenarios
 

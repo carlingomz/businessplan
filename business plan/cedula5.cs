@@ -23,11 +23,12 @@ namespace business_plan
 
         #region variables globales
         string idsucursal = "Total";
+        string querypromedio_ctasXpagar = "",querypromedio_ctasXcobrar="";
         private string[] idd = new string[1000];
         private string[,] provedor =new string[1,1];
         private string[,] marca =new string[1,1];
         private DateTime ejercicio = DateTime.Now;
-        private double enero = 0, febrero = 0, marzo = 0, abril = 0, mayo = 0, junio = 0, julio = 0, agosto = 0, septiembre = 0, octubre = 0, noviembre = 0, diciembre = 0, saldoAcum = 0;
+        double enero = 0, febrero = 0, marzo = 0, abril = 0, mayo = 0, junio = 0, julio = 0, agosto = 0, septiembre = 0, octubre = 0, noviembre = 0, diciembre = 0, saldoAcum = 0;
         private string marc = "",prov="",nump="";
         string nombre = "";
         double[] rotacion = new double[1000];
@@ -36,6 +37,7 @@ namespace business_plan
         DateTime FechaAI = DateTime.Now;
         DateTime FechaAF = DateTime.Now;
         double DPMA = 0;
+        double[] promedio=new double[1000];
         #endregion variables globales
 
         public cedula5()
@@ -73,40 +75,18 @@ namespace business_plan
 
             #endregion Abrir conexion
 
-            #region cargar combo provedor
-
-            query = "SELECT p.`raz_soc` AS provedor ,p.`proveedor` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor`;";
-            cmd = new MySqlCommand(query, ConnCipsis);
-            reader = cmd.ExecuteReader();
-            while (reader.Read())
-            {
-                cbEstructura.Items.Add(reader["provedor"].ToString());
-            }
-            reader.Close();
-
-            #endregion cargar combo provedor
-
-            #region cargar combo marca
-
-            //query = "SELECT m.`descrip`,m.`marca` FROM saldoprov AS S INNER JOIN marca AS m ON S.`marca`=m.`marca`;";
-            //cmd = new MySqlCommand(query, ConnCipsis);
-            //reader = cmd.ExecuteReader();
-            //while (reader.Read())
-            //{
-            //    cbEstructura2.Items.Add(reader["descrip"].ToString());
-            //}
-            //reader.Close();
-
-            #endregion cargar combo marca
-
             #region Colorear Datagrid
-            dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#2882ff");
-            dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#abcdef");
+            //dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
+            dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#B4FF8F");
+            //dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#9DC1C1");
+            dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#33D633");
             dgvCed1.CellBorderStyle = DataGridViewCellBorderStyle.None;
             #endregion
             #region Colorear Datagrid
-            dgvced5b.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#2882ff");
-            dgvced5b.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#abcdef");
+            //dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
+            dgvced5b.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#B4FF8F");
+            //dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#9DC1C1");
+            dgvced5b.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#33D633");
             dgvced5b.CellBorderStyle = DataGridViewCellBorderStyle.None;
             #endregion
         }
@@ -539,172 +519,959 @@ namespace business_plan
 
         private void cbEstructura_TextChanged_1(object sender, EventArgs e)
         {
-            dgvCed1.Rows.Clear();
-            cbEstructura2.Items.Clear();
-            cbEstructura2.Items.Add("Total");
-            int i = 0;
-            if (cbEstructura.Text != "Total")
-            {
-                cbEstructura2.Show();
-                query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE p.raz_soc='" + cbEstructura.Text + "';";
-                cmd = new MySqlCommand(query, ConnCipsis);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    dgvCed1.Rows[0].Cells[0].Value = reader["proveedor"].ToString();
-                    dgvCed1.Rows[0].Cells[1].Value = reader["proveedor"].ToString();
-                }
+            //dgvCed1.Rows.Clear();
+            //cbEstructura2.Items.Clear();
+            //cbEstructura2.Items.Add("Total");
+            //int i = 0;
+            //if (cbEstructura.Text != "Total")
+            //{
+            //    cbEstructura2.Show();
+            //    query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE p.raz_soc='" + cbEstructura.Text + "';";
+            //    cmd = new MySqlCommand(query, ConnCipsis);
+            //    reader = cmd.ExecuteReader();
+            //    while (reader.Read())
+            //    {
+            //        dgvCed1.Rows[0].Cells[0].Value = reader["proveedor"].ToString();
+            //        dgvCed1.Rows[0].Cells[1].Value = reader["proveedor"].ToString();
+            //    }
 
-                reader.Close();
+            //    reader.Close();
 
-                query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE p.`raz_soc`='" + cbEstructura.Text + "';";
-                cmd = new MySqlCommand(query, ConnCipsis);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    cbEstructura2.Items.Add(reader["descrip"].ToString());
-                }
-                reader.Close();
-            }
-            if (cbEstructura.Text == "Total")
-            {
-                cbEstructura2.Hide();
-                query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca`;";
-                cmd = new MySqlCommand(query, ConnCipsis);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    dgvCed1.Rows.Add();
-                    dgvCed1.Rows[i].Cells[0].Value = reader["proveedor"].ToString();
-                    dgvCed1.Rows[i].Cells[1].Value = reader["provedor"].ToString();
-                    i++;
-                }
-                reader.Close();
-                i = 0;
-                ////////////////////////////////////////////////////////////////////
-                query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca`;";
-                cmd = new MySqlCommand(query, ConnCipsis);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    //dgvCed1.Rows[i].Cells[0].Value = reader["proveedor"].ToString();
-                    dgvCed1.Rows[i].Cells[2].Value = reader["descrip"].ToString();
-                    i++;
-                }
-                reader.Close();
-            }
+            //    query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE p.`raz_soc`='" + cbEstructura.Text + "';";
+            //    cmd = new MySqlCommand(query, ConnCipsis);
+            //    reader = cmd.ExecuteReader();
+            //    while (reader.Read())
+            //    {
+            //        cbEstructura2.Items.Add(reader["descrip"].ToString());
+            //    }
+            //    reader.Close();
+            //}
+            //if (cbEstructura.Text == "Total")
+            //{
+            //    cbEstructura2.Hide();
+            //    query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca`;";
+            //    cmd = new MySqlCommand(query, ConnCipsis);
+            //    reader = cmd.ExecuteReader();
+            //    while (reader.Read())
+            //    {
+            //        dgvCed1.Rows.Add();
+            //        dgvCed1.Rows[i].Cells[0].Value = reader["proveedor"].ToString();
+            //        dgvCed1.Rows[i].Cells[1].Value = reader["provedor"].ToString();
+            //        i++;
+            //    }
+            //    reader.Close();
+            //    i = 0;
+            //    ////////////////////////////////////////////////////////////////////
+            //    query = "SELECT p.`proveedor`, p.`raz_soc` AS provedor ,m.`marca`, m.`descrip` FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca`;";
+            //    cmd = new MySqlCommand(query, ConnCipsis);
+            //    reader = cmd.ExecuteReader();
+            //    while (reader.Read())
+            //    {
+            //        //dgvCed1.Rows[i].Cells[0].Value = reader["proveedor"].ToString();
+            //        dgvCed1.Rows[i].Cells[2].Value = reader["descrip"].ToString();
+            //        i++;
+            //    }
+            //    reader.Close();
+            //}
         }
 
         private void cbEstructura2_TextChanged_1(object sender, EventArgs e)
         {
-            int i = 0;
-            if (cbEstructura2.Text == "Total")
-            {
-                dgvCed1.Rows[0].Cells[2].Value = "Total";
-                idd[0] = "";
-            }
-            else
-                if (cbEstructura2.Text != "Total")
-                {
-                    dgvCed1.Rows[0].Cells[2].Value = cbEstructura2.Text;
-                    idd[0] = "AND m.`descrip`='" + cbEstructura2.Text + "';";
-                }
-                else { }
+            //int i = 0;
+            //if (cbEstructura2.Text == "Total")
+            //{
+            //    dgvCed1.Rows[0].Cells[2].Value = "Total";
+            //    idd[0] = "";
+            //}
+            //else
+            //    if (cbEstructura2.Text != "Total")
+            //    {
+            //        dgvCed1.Rows[0].Cells[2].Value = cbEstructura2.Text;
+            //        idd[0] = "AND m.`descrip`='" + cbEstructura2.Text + "';";
+            //    }
+            //    else { }
         }
 
         private void btnSimular_Click_1(object sender, EventArgs e)
         {
-            int i = dgvCed1.Rows.Count;
-            int j = 0;
             ejercicio = DateTime.Parse(dtpFechaEjercicio.Value.ToString());
-            #region total total
-            if (cbEstructura.Text == "Total")
+            int j = 0;
+            for (int i = 0; i <= dgvCed1.Rows.Count - 1; i++)
             {
-                query = "SELECT saldoact AS saldoact, enero AS enero1,febrero AS febrero1, marzo AS marzo1,abril AS abril1, mayo AS mayo1, junio AS junio1, julio AS julio1, agosto AS agosto1,septiembre AS septiembre1, octubre AS octubre1, noviembre AS noviembre1, diciembre AS diciembre1 FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "'";
-                cmd = new MySqlCommand(query, ConnCipsis);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
+                #region cueros
+                try
                 {
-                    enero = double.Parse(reader["enero1"].ToString());
-                    febrero = double.Parse(reader["febrero1"].ToString());
-                    marzo = double.Parse(reader["marzo1"].ToString());
-                    abril = double.Parse(reader["abril1"].ToString());
-                    mayo = double.Parse(reader["mayo1"].ToString());
-                    junio = double.Parse(reader["junio1"].ToString());
-                    julio = double.Parse(reader["julio1"].ToString());
-                    agosto = double.Parse(reader["agosto1"].ToString());
-                    septiembre = double.Parse(reader["septiembre1"].ToString());
-                    octubre = double.Parse(reader["octubre1"].ToString());
-                    noviembre = double.Parse(reader["noviembre1"].ToString());
-                    diciembre = double.Parse(reader["diciembre1"].ToString());
-                    saldoAcum = double.Parse(reader["saldoact"].ToString());
-
-                    if (j <= i)
+                    if (comboBox3.Text == "Total")
                     {
-                        dgvCed1.Rows[j].Cells[3].Value = enero.ToString("C2");
-                        dgvCed1.Rows[j].Cells[4].Value = febrero.ToString("C2");
-                        dgvCed1.Rows[j].Cells[5].Value = marzo.ToString("C2");
-                        dgvCed1.Rows[j].Cells[6].Value = abril.ToString("C2");
-                        dgvCed1.Rows[j].Cells[7].Value = mayo.ToString("C2");
-                        dgvCed1.Rows[j].Cells[8].Value = junio.ToString("C2");
-                        dgvCed1.Rows[j].Cells[9].Value = julio.ToString("C2");
-                        dgvCed1.Rows[j].Cells[10].Value = agosto.ToString("C2");
-                        dgvCed1.Rows[j].Cells[11].Value = septiembre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[12].Value = octubre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[13].Value = noviembre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[14].Value = diciembre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[15].Value = saldoAcum.ToString("C2");
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT saldoact AS saldoact, enero AS enero1,febrero AS febrero1, marzo AS marzo1,abril AS abril1, mayo AS mayo1, junio AS junio1, julio AS julio1, agosto AS agosto1,septiembre AS septiembre1, octubre AS octubre1, noviembre AS noviembre1, diciembre AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "';";
+                        }
+                        else
+                        {
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto =0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if(j<dgvCed1.RowCount-1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
                     }
-                    j++;
-                }
-                reader.Close();
-            }
-            else { }
-            #endregion
-            #region provedor marca
-            if (cbEstructura.Text != "Total")
-            {
-                query = "SELECT saldoact AS saldoact, enero AS enero1,febrero AS febrero1, marzo AS marzo1,abril AS abril1, mayo AS mayo1, junio AS junio1, julio AS julio1, agosto AS agosto1,septiembre AS septiembre1, octubre AS octubre1, noviembre AS noviembre1, diciembre AS diciembre1 FROM saldoprov AS S INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND p.raz_soc='" + cbEstructura.Text + "' " + idd[0] + "";
-                cmd = new MySqlCommand(query, ConnCipsis);
-                reader = cmd.ExecuteReader();
-                while (reader.Read())
+                    else { }
+                    if (comboBox3.Text == "Sucursal")
+                    {
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + " AND V.IDSUCURSAL='" + idd[i] + "';";
+
+                        }
+                        #endregion
+                        #region llenardgv
+                        //cmd = new MySqlCommand(query, Conn);
+                        //reader = cmd.ExecuteReader();
+                        //while (reader.Read())
+                        //{
+                        //    if (reader["prom"].ToString() == "")
+                        //    {
+                        //        PVunit = 0;
+                        //    }
+                        //    else
+                        //    {
+                        //        PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
+                        //    }
+                        //}
+
+                        //reader.Close();
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Division")
+                    {
+                            #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.iddivisiones='" + idd[i] + "';";
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Departamento")
+                    {
+                            #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.iddepto='" + idd[i] + "';";
+                            #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Familia")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idfamilia='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idlinea='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea 1")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idl1='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea 2")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idl2='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea 3")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idl3='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea 4")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idl4='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea 5")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idl5='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                    if (comboBox3.Text == "Linea 6")
+                    {
+                        #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.idl6='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                    }
+                    else { }
+                        if (comboBox3.Text == "Marca")
+                        {
+                            #region query
+                        query = "SELECT saldoact AS saldoact, SUM(enero) AS enero1,SUM(febrero) AS febrero1, SUM(marzo) AS marzo1,SUM(abril) AS abril1, SUM(mayo) AS mayo1, SUM(junio) AS junio1, SUM(julio) AS julio1, SUM(agosto) AS agosto1,SUM(septiembre) AS septiembre1, SUM(octubre) AS octubre1, SUM(noviembre) AS noviembre1, SUM(diciembre) AS diciembre1 FROM saldoprovfactorajeart AS S LEFT JOIN estarticulo AS E ON S.`idarticulo`=E.`idarticulo` INNER JOIN prov AS p ON S.`idproveedor`=p.`proveedor` INNER JOIN marca AS m ON S.`marca`=m.`marca` WHERE ejercicio = '" + ejercicio.ToString("yyyy") + "' AND E.marca='" + idd[i] + "';";
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, ConnCipsis);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["saldoact"].ToString() != "")
+                            {
+                                enero = double.Parse(reader["enero1"].ToString());
+                                febrero = double.Parse(reader["febrero1"].ToString());
+                                marzo = double.Parse(reader["marzo1"].ToString());
+                                abril = double.Parse(reader["abril1"].ToString());
+                                mayo = double.Parse(reader["mayo1"].ToString());
+                                junio = double.Parse(reader["junio1"].ToString());
+                                julio = double.Parse(reader["julio1"].ToString());
+                                agosto = double.Parse(reader["agosto1"].ToString());
+                                septiembre = double.Parse(reader["septiembre1"].ToString());
+                                octubre = double.Parse(reader["octubre1"].ToString());
+                                noviembre = double.Parse(reader["noviembre1"].ToString());
+                                diciembre = double.Parse(reader["diciembre1"].ToString());
+                                saldoAcum = double.Parse(reader["saldoact"].ToString());
+                            }
+                            else
+                            {
+                                enero = 0;
+                                febrero = 0;
+                                marzo = 0;
+                                abril = 0;
+                                mayo = 0;
+                                junio = 0;
+                                julio = 0;
+                                agosto = 0;
+                                septiembre = 0;
+                                octubre = 0;
+                                noviembre = 0;
+                                diciembre = 0;
+                                saldoAcum = 0;
+                            }
+                            #region Mostrar en dgvCed1
+                            if (j < dgvCed1.RowCount - 1)
+                            {
+                                dgvCed1.Rows[j].Cells[1].Value = enero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[2].Value = febrero.ToString("C2");
+                                dgvCed1.Rows[j].Cells[3].Value = marzo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[4].Value = abril.ToString("C2");
+                                dgvCed1.Rows[j].Cells[5].Value = mayo.ToString("C2");
+                                dgvCed1.Rows[j].Cells[6].Value = junio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[7].Value = julio.ToString("C2");
+                                dgvCed1.Rows[j].Cells[8].Value = agosto.ToString("C2");
+                                dgvCed1.Rows[j].Cells[9].Value = septiembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[10].Value = octubre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[11].Value = noviembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[12].Value = diciembre.ToString("C2");
+                                dgvCed1.Rows[j].Cells[13].Value = saldoAcum.ToString("C2");
+                            }
+                            j++;
+                            #endregion Mostrar en dgvCed1
+                        }
+                        reader.Close();
+
+                        #endregion
+                        }
+                        else { }
+                    }
+                 catch (Exception y)
                 {
-                    enero = double.Parse(reader["enero1"].ToString());
-                    febrero = double.Parse(reader["febrero1"].ToString());
-                    marzo = double.Parse(reader["marzo1"].ToString());
-                    abril = double.Parse(reader["abril1"].ToString());
-                    mayo = double.Parse(reader["mayo1"].ToString());
-                    junio = double.Parse(reader["junio1"].ToString());
-                    julio = double.Parse(reader["julio1"].ToString());
-                    agosto = double.Parse(reader["agosto1"].ToString());
-                    septiembre = double.Parse(reader["septiembre1"].ToString());
-                    octubre = double.Parse(reader["octubre1"].ToString());
-                    noviembre = double.Parse(reader["noviembre1"].ToString());
-                    diciembre = double.Parse(reader["diciembre1"].ToString());
-                    saldoAcum = double.Parse(reader["saldoact"].ToString());
-
-                    if (j <= i)
-                    {
-                        dgvCed1.Rows[j].Cells[3].Value = enero.ToString("C2");
-                        dgvCed1.Rows[j].Cells[4].Value = febrero.ToString("C2");
-                        dgvCed1.Rows[j].Cells[5].Value = marzo.ToString("C2");
-                        dgvCed1.Rows[j].Cells[6].Value = abril.ToString("C2");
-                        dgvCed1.Rows[j].Cells[7].Value = mayo.ToString("C2");
-                        dgvCed1.Rows[j].Cells[8].Value = junio.ToString("C2");
-                        dgvCed1.Rows[j].Cells[9].Value = julio.ToString("C2");
-                        dgvCed1.Rows[j].Cells[10].Value = agosto.ToString("C2");
-                        dgvCed1.Rows[j].Cells[11].Value = septiembre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[12].Value = octubre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[13].Value = noviembre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[14].Value = diciembre.ToString("C2");
-                        dgvCed1.Rows[j].Cells[15].Value = saldoAcum.ToString("C2");
-                    }
-                    j++;
+                    MessageBox.Show("Error " + y);
                 }
-                reader.Close();
+                #endregion
+                try
+                {
+                    #region Mostrar en dgvCed1
+                    //dgvCed1.Rows[i].Cells[1].Value = enero.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[2].Value = febrero.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[3].Value = marzo.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[4].Value = abril.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[5].Value = mayo.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[6].Value = junio.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[7].Value = julio.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[8].Value = agosto.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[9].Value = septiembre.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[10].Value = octubre.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[11].Value = noviembre.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[12].Value = diciembre.ToString("C2");
+                    //dgvCed1.Rows[i].Cells[13].Value = saldoAcum.ToString("C2");
+                    #endregion Mostrar en dgvCed1
+                }
+                catch (Exception z)
+                {
+                    MessageBox.Show("Error " + z);
+                }
             }
-            else { }
-            #endregion
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -864,37 +1631,40 @@ namespace business_plan
                         #region querys
                     //try
                     //{
-                    //    if (cbEstructura2.Text == "Total")
-                    //    {
-                    //        #region query
-                    //        if (idsucursal == "Total")
-                    //        {
-                    //            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                    //        }
-                    //        else
-                    //        {
-                    //            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
-                    //        }
-                    //        #endregion
-                    //        #region llenardgv
-                    //        cmd = new MySqlCommand(query, Conn);
-                    //        reader = cmd.ExecuteReader();
-                    //        while (reader.Read())
-                    //        {
-                    //            if (reader["prom"].ToString() == "")
-                    //            {
-                    //                PVunit = 0;
-                    //            }
-                    //            else
-                    //            {
-                    //                PVunit = Math.Round(double.Parse(reader["prom"].ToString()), 0);
-                    //            }
-                    //        }
-                    //        reader.Close();
+                    if (comboBox3.Text == "Total")
+                    {
+                        #region query
+                        if (idsucursal == "Total")
+                        {
+                            #region rotacion cuentas por pagar 
+                            querypromedio_ctasXpagar = "SELECT (SUM(saldoact)+SUM(saldoant))/2 AS promedio FROM saldoprovfactorajeart AS S INNER JOIN estarticulo AS E ON S.idarticulo=E.idarticulo WHERE E.fecha BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "'";
+                            #endregion
+                            #region plazo medio de cobros
+                            querypromedio_ctasXpagar = "SELECT (SUM(total)+SUM(apagar))/2 AS promedio FROM factprov AS P LEFT JOIN estarticulo AS E ON P.proveedor=E.proveedor WHERE E.fecha BETWEEN '"+FechaAI.ToString("yyyy-MM-dd")+"' AND '"+FechaAF.ToString("yyyy-MM-dd")+"'";
+                            #endregion
+                        }
+                        else
+                        {
+                            query = "SELECT ((SUM(impneto))/(SUM(ctdneta))) AS prom FROM VENTASBASE AS V INNER JOIN SUCURSAL AS S ON V.IDSUCURSAL = S.IDSUCURSAL INNER JOIN FECHA AS F ON F.IDFECHA = V.IDFECHA WHERE  (V.IDSUCURSAL='01' OR V.IDSUCURSAL='02' OR V.IDSUCURSAL='06' OR V.IDSUCURSAL='08')  AND F.FECHA BETWEEN '" + FechaAI.ToString("yyyy-MM-dd") + "' AND '" + FechaAF.ToString("yyyy-MM-dd") + "';";
+                        }
+                        #endregion
+                        #region llenardgv
+                        cmd = new MySqlCommand(query, Conn);
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader["prom"].ToString() == "")
+                            {
+                            }
+                            else
+                            {
+                            }
+                        }
+                        reader.Close();
 
-                    //        #endregion
-                    //    }
-                    //    else { }
+                        #endregion
+                    }
+                    else { }
                     //    if (cbEstructura2.Text == "Sucursal")
                     //    {
                     //        #region query
@@ -1339,6 +2109,291 @@ namespace business_plan
                 i++;
             }
             reader.Close();
-        } 
+            formargrid(FechaAI,FechaAF);
+        }
+
+        private void comboBox3_TextChanged(object sender, EventArgs e)
+        {
+            int i = 0;
+            string SeleccionActual = comboBox3.Text;
+            #region total
+            if (SeleccionActual == "Total")
+            {
+                dgvCed1.Rows.Clear();
+                dgvCed1.Rows.Add();
+                dgvCed1.Rows[0].Cells[0].Value = "Total";
+            }
+            else
+            { }
+            #endregion
+            #region sucursal
+            if (SeleccionActual == "Sucursal")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idsucursal from sucursal where visible='S';";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idsucursal"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region division
+            if (SeleccionActual == "Division")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,iddivisiones from estdivisiones;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["iddivisiones"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region Departamento
+            if (SeleccionActual == "Departamento")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,iddepto from estdepartamento;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["iddepto"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region Familia
+            if (SeleccionActual == "Familia")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idfamilia from estfamilia;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idfamilia"].ToString();
+
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region Linea
+            if (SeleccionActual == "Linea")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idlinea from estlinea;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idlinea"].ToString();
+
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region linea 1
+            if (SeleccionActual == "Linea 1")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idl1 from estl1;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idl1"].ToString();
+
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region linea 2
+            if (SeleccionActual == "Linea 2")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idl2 from estl2;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idl2"].ToString();
+
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region linea 3
+            if (SeleccionActual == "Linea 3")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idl3 from estl3;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idl3"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region linea 4
+            if (SeleccionActual == "Linea 4")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idl4 from estl4;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idl4"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region linea 5
+            if (SeleccionActual == "Linea 5")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip,idl5 from estl5;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idl5"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region linea 6
+            if (SeleccionActual == "Linea 6")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT distinct descrip, idl6 from estl6;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["idl6"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+            #region Marca
+            if (SeleccionActual == "Marca")
+            {
+                dgvCed1.Rows.Clear();
+                query = "SELECT marca, descrip  from marca;";
+                cmd = new MySqlCommand(query, Conn);
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    //cbEstructura.Items.Add(reader["descrip"].ToString());
+                    dgvCed1.Rows.Add();
+                    dgvCed1.Rows[i].Cells[0].Value = reader["descrip"].ToString();
+                    idd[i] = reader["marca"].ToString();
+                    i++;
+                }
+                reader.Close();
+            }
+            else
+            { }
+            #endregion
+        }
+
+        private void formargrid(DateTime fecha1, DateTime fecha2)
+        {
+            int c = 0, i = 1;
+            c = Math.Abs((fecha1.Month - fecha2.Month) + 12 * (fecha1.Year - fecha2.Year));
+            dgvced5b.ColumnCount = (c*7)+1;
+            dgvced5b.ColumnHeadersVisible = true;
+            int j = c;
+            int m = 1;
+            while (j != 0)
+            {
+                dgvced5b.Columns[i].Name = "Dias que permanece mercancia en almacen mes "+m;
+                dgvced5b.Columns[i + 1].Name = "Rotacion de cuentas por pagar mes "+m;
+                dgvced5b.Columns[i + 2].Name = "Plazo medio de pagos mes "+m;
+                dgvced5b.Columns[i + 3].Name = "Plazo medio de cobros mes "+m;
+                dgvced5b.Columns[i + 4].Name = "Dias financiados mes "+m;
+                dgvced5b.Columns[i + 5].Name = "Importe dias financiados mes "+m;
+                dgvced5b.Columns[i + 6].Name = "Utilidad de dias financiados mes "+m;
+                j--;
+                i = i + 7;
+                m++;
+            }
+        }
+
     }
 }

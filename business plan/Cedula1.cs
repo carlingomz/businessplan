@@ -771,48 +771,53 @@ namespace business_plan
                     nInv = int.Parse(dgvCed1.Rows[i].Cells[1].Value.ToString(), NumberStyles.Currency);
                     RinvD = int.Parse(dgvCed1.Rows[i].Cells[2].Value.ToString(), NumberStyles.Currency);
                     TimeSpan dias = FechaAF.Subtract(FechaAI);
+                    int meses=(FechaAI.Month - FechaAF.Month) + 12 * (FechaAI.Year - FechaAF.Year);
                     TasaInt = (TasaInt / 100) + 1;
-                    DI = Math.Round(double.Parse(dias.Days.ToString()) / RinvD, 2);
-                    VmI = ((PVunit * PrP) / 12)*TasaInt;
+
+                    PrP = (nInv * RinvD);
+                    VmI = ((PVunit * PrP) / (-1*meses))*TasaInt;
                     VdI = ((PrP * PVunit) / double.Parse(dias.Days.ToString()))*TasaInt;
                     VTI = (PrP * PVunit)*TasaInt;
 
                     PVunit = PVunit * TasaInt;
-                    PrP = Math.Round(nInv * RinvD, 0);
-                    VmP = Math.Round(PrP / 12, 0);
-                    VdP = Math.Round(PrP / 365, 0);
-                
+                    VmP = (PrP /(-1*meses));
+                    VdP = Math.Round(PrP / double.Parse(dias.Days.ToString()));
+                    DI = Math.Round(double.Parse(dias.Days.ToString()) / RinvD, 2);
+
                 }
                 else { }
                 #endregion
                 #region caso 2
-                //if (dgvCed1.Rows[i].Cells[2].Value != null && dgvCed1.Rows[i].Cells[3].Value != null)
-                //{
-                //    nInv = int.Parse(dgvCed1.Rows[i].Cells[1].Value.ToString(), NumberStyles.Currency);
-                //    VTI = int.Parse(dgvCed1.Rows[i].Cells[3].Value.ToString(), NumberStyles.Currency);
-                //    TimeSpan dias = FechaAF.Subtract(FechaAI);
-                //    RinvD = int.Parse(dgvCed1.Rows[i].Cells[2].Value.ToString(), NumberStyles.Currency);
-                //    TasaInt = (TasaInt / 100) + 1;
-                //    DI = Math.Round(double.Parse(dias.Days.ToString()) / RinvD, 2);
-                //    VmI = Math.Round((PVunit * PrP) / 12);
-                //    VdI = Math.Round((PrP * PVunit) / double.Parse(dias.Days.ToString()));
-                    
-                //    VmI = VmI * TasaInt;
-                //    VdI = VdI * TasaInt;
-                //    PVunit = PVunit * TasaInt;
-                //    PrP = Math.Round(nInv * RinvD, 0);
-                //    VmP = Math.Round(PrP / 12, 0);
-                //    VdP = Math.Round(PrP / 365, 0);
-                //}
+                if (dgvCed1.Rows[i].Cells[2].Value != null && dgvCed1.Rows[i].Cells[3].Value != null)
+                {
+                    TasaInt = (TasaInt / 100) + 1;
+                    PVunit = PVunit * TasaInt;
+                    VTI = int.Parse(dgvCed1.Rows[i].Cells[3].Value.ToString(), NumberStyles.Currency);
+                    TimeSpan dias = FechaAF.Subtract(FechaAI);
+                    int meses = (FechaAI.Month - FechaAF.Month) + 12 * (FechaAI.Year - FechaAF.Year);
+                    RinvD = int.Parse(dgvCed1.Rows[i].Cells[2].Value.ToString(), NumberStyles.Currency);
+                    nInv = (VTI / PVunit)/RinvD;
+                    PrP = Math.Round(nInv * RinvD, 0);
+
+                    VmP = (PrP / (-1 * meses));
+                    VdP = Math.Round(PrP / double.Parse(dias.Days.ToString()));
+                    VmI = ((PVunit * PrP) / (-1 * meses)) * TasaInt;
+                    VdI = Math.Round((PrP * PVunit) / double.Parse(dias.Days.ToString()));
+                    VmI = PrP * PVunit / double.Parse(meses.ToString());
+                    VdI = PrP / double.Parse(dias.Days.ToString());
+                    DI = Math.Round(double.Parse(dias.Days.ToString()) / RinvD, 2);
+                   
+                }
                 #endregion
                 try
                 {
                     #region Mostrar en dgvCed1
+                    dgvCed1.Rows[i].Cells[1].Value=nInv.ToString("00,0");
                     dgvCed1.Rows[i].Cells[2].Value=RinvD.ToString();
                     dgvCed1.Rows[i].Cells[3].Value = VTI.ToString("C0");
                     dgvCed1.Rows[i].Cells[4].Value = PrP.ToString("00,0");
                     dgvCed1.Rows[i].Cells[5].Value = PVunit.ToString("C0");
-                    dgvCed1.Rows[i].Cells[6].Value = VmP.ToString("C0");
+                    dgvCed1.Rows[i].Cells[6].Value = VmP.ToString("00,0");
                     dgvCed1.Rows[i].Cells[7].Value = VmI.ToString("C0");
                     dgvCed1.Rows[i].Cells[8].Value = VdP.ToString();
                     dgvCed1.Rows[i].Cells[9].Value = VdI.ToString("C0");
@@ -978,11 +983,16 @@ namespace business_plan
         private void Cedula1_Load(object sender, EventArgs e)
         {
             //dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
-            dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#2882ff");
+            dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#B4FF8F");
             //dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#9DC1C1");
-            dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#abcdef");
+            dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#43BF43");
             dgvCed1.CellBorderStyle = DataGridViewCellBorderStyle.None;
             tbEscenario.Focus();
+            //dgvCed1.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#ADEBEB");
+            dgvRep.RowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#B4FF8F");
+            //dgvCed1.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#9DC1C1");
+            dgvRep.AlternatingRowsDefaultCellStyle.BackColor = System.Drawing.ColorTranslator.FromHtml("#33D633");
+            dgvRep.CellBorderStyle = DataGridViewCellBorderStyle.None;
         }
 
         private void Cedula1_Resize(object sender, EventArgs e)
@@ -1062,16 +1072,16 @@ namespace business_plan
                     Categoria = reader["Categoria"].ToString();
                     dgvRep.Rows.Add();
                     dgvRep.Rows[i].Cells[0].Value = Categoria;
-                    dgvRep.Rows[i].Cells[1].Value = nInv.ToString("C2");
-                    dgvRep.Rows[i].Cells[2].Value = RinvD.ToString("C2");
-                    dgvRep.Rows[i].Cells[3].Value = VTI.ToString("C2");
-                    dgvRep.Rows[i].Cells[4].Value = PrP.ToString("C2");
-                    dgvRep.Rows[i].Cells[5].Value = PVunit.ToString("C2");
-                    dgvRep.Rows[i].Cells[6].Value = VmP.ToString("C2");
-                    dgvRep.Rows[i].Cells[7].Value = VmI.ToString("C2");
-                    dgvRep.Rows[i].Cells[8].Value = VdP.ToString("C2");
-                    dgvRep.Rows[i].Cells[9].Value = VdI.ToString("C2");
-                    dgvRep.Rows[i].Cells[10].Value = DI.ToString("C2");
+                    dgvRep.Rows[i].Cells[1].Value = nInv.ToString("00,0");
+                    dgvRep.Rows[i].Cells[2].Value = RinvD.ToString();
+                    dgvRep.Rows[i].Cells[3].Value = VTI.ToString("C0");
+                    dgvRep.Rows[i].Cells[4].Value = PrP.ToString("00,0");
+                    dgvRep.Rows[i].Cells[5].Value = PVunit.ToString("C0");
+                    dgvRep.Rows[i].Cells[6].Value = VmP.ToString("00,0");
+                    dgvRep.Rows[i].Cells[7].Value = VmI.ToString("C0");
+                    dgvRep.Rows[i].Cells[8].Value = VdP.ToString("0,0");
+                    dgvRep.Rows[i].Cells[9].Value = VdI.ToString("C0");
+                    dgvRep.Rows[i].Cells[10].Value = DI.ToString("0,0");
 
                     //lbrepo.Text = "Escenario " + reader["Escenario"].ToString() + " creado el " + reader["Fecha"].ToString() + " de el periodo de " + reader["PeriodoI"].ToString() + " a " + reader["PeriodoF"].ToString() + "";
                     i++;

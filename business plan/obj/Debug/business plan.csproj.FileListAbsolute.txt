@@ -53,3 +53,4 @@ C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business p
 C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula5.resources
 C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula4.resources
 C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula6.resources
+C:\Users\carlos\Documents\GitHub\businessplan\business plan\obj\Debug\business_plan.cedula_6.resources

@@ -49,8 +49,6 @@
             this.tabControl2 = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.dgvCed1 = new System.Windows.Forms.DataGridView();
-            this.Column23 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -66,12 +64,10 @@
             this.Column26 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column27 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label9 = new System.Windows.Forms.Label();
-            this.cbEstructura2 = new System.Windows.Forms.ComboBox();
+            this.comboBox3 = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.btnNuevo = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.cbEstructura = new System.Windows.Forms.ComboBox();
             this.cbModificar = new System.Windows.Forms.ComboBox();
             this.chbModificar = new System.Windows.Forms.CheckBox();
             this.btnGuardar = new System.Windows.Forms.Button();
@@ -84,13 +80,6 @@
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.dgvced5b = new System.Windows.Forms.DataGridView();
             this.Column28 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column29 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column30 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column31 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column32 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column33 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column34 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column35 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel4 = new System.Windows.Forms.Panel();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -286,8 +275,6 @@
             this.dgvCed1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.dgvCed1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCed1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column23,
-            this.Column10,
             this.Column11,
             this.Column12,
             this.Column13,
@@ -317,24 +304,10 @@
             this.dgvCed1.TabIndex = 6;
             this.dgvCed1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvCed1_CellContentClick);
             // 
-            // Column23
-            // 
-            this.Column23.Frozen = true;
-            this.Column23.HeaderText = "Numero de provedor";
-            this.Column23.Name = "Column23";
-            this.Column23.ReadOnly = true;
-            // 
-            // Column10
-            // 
-            this.Column10.Frozen = true;
-            this.Column10.HeaderText = "Provedor";
-            this.Column10.Name = "Column10";
-            this.Column10.ReadOnly = true;
-            // 
             // Column11
             // 
             this.Column11.Frozen = true;
-            this.Column11.HeaderText = "Marca";
+            this.Column11.HeaderText = "Categoria";
             this.Column11.Name = "Column11";
             this.Column11.ReadOnly = true;
             // 
@@ -422,12 +395,10 @@
             // panel1
             // 
             this.panel1.AutoSize = true;
-            this.panel1.Controls.Add(this.label9);
-            this.panel1.Controls.Add(this.cbEstructura2);
+            this.panel1.Controls.Add(this.comboBox3);
             this.panel1.Controls.Add(this.label8);
             this.panel1.Controls.Add(this.btnNuevo);
             this.panel1.Controls.Add(this.label5);
-            this.panel1.Controls.Add(this.cbEstructura);
             this.panel1.Controls.Add(this.cbModificar);
             this.panel1.Controls.Add(this.chbModificar);
             this.panel1.Controls.Add(this.btnGuardar);
@@ -444,35 +415,37 @@
             this.panel1.TabIndex = 7;
             this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
             // 
-            // label9
+            // comboBox3
             // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(239, 18);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(37, 13);
-            this.label9.TabIndex = 19;
-            this.label9.Text = "Marca";
-            // 
-            // cbEstructura2
-            // 
-            this.cbEstructura2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbEstructura2.FormattingEnabled = true;
-            this.cbEstructura2.Items.AddRange(new object[] {
-            "Total"});
-            this.cbEstructura2.Location = new System.Drawing.Point(206, 41);
-            this.cbEstructura2.Name = "cbEstructura2";
-            this.cbEstructura2.Size = new System.Drawing.Size(172, 21);
-            this.cbEstructura2.TabIndex = 18;
-            this.cbEstructura2.TextChanged += new System.EventHandler(this.cbEstructura2_TextChanged_1);
+            this.comboBox3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox3.FormattingEnabled = true;
+            this.comboBox3.Items.AddRange(new object[] {
+            "Total",
+            "Division",
+            "Departamento",
+            "Familia",
+            "Linea",
+            "Linea 1",
+            "Linea 2",
+            "Linea 3",
+            "Linea 4",
+            "Linea 5",
+            "Linea 6",
+            "Marca"});
+            this.comboBox3.Location = new System.Drawing.Point(17, 34);
+            this.comboBox3.Name = "comboBox3";
+            this.comboBox3.Size = new System.Drawing.Size(172, 21);
+            this.comboBox3.TabIndex = 25;
+            this.comboBox3.TextChanged += new System.EventHandler(this.comboBox3_TextChanged);
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(64, 18);
+            this.label8.Location = new System.Drawing.Point(68, 15);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(61, 13);
+            this.label8.Size = new System.Drawing.Size(55, 13);
             this.label8.TabIndex = 17;
-            this.label8.Text = "Provedores";
+            this.label8.Text = "Estructura";
             // 
             // btnNuevo
             // 
@@ -492,18 +465,6 @@
             this.label5.Size = new System.Drawing.Size(110, 13);
             this.label5.TabIndex = 13;
             this.label5.Text = "Nombre del escenario";
-            // 
-            // cbEstructura
-            // 
-            this.cbEstructura.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbEstructura.FormattingEnabled = true;
-            this.cbEstructura.Items.AddRange(new object[] {
-            "Total"});
-            this.cbEstructura.Location = new System.Drawing.Point(17, 41);
-            this.cbEstructura.Name = "cbEstructura";
-            this.cbEstructura.Size = new System.Drawing.Size(172, 21);
-            this.cbEstructura.TabIndex = 12;
-            this.cbEstructura.TextChanged += new System.EventHandler(this.cbEstructura_TextChanged_1);
             // 
             // cbModificar
             // 
@@ -616,14 +577,7 @@
             this.dgvced5b.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.dgvced5b.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvced5b.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column28,
-            this.Column29,
-            this.Column30,
-            this.Column31,
-            this.Column32,
-            this.Column33,
-            this.Column34,
-            this.Column35});
+            this.Column28});
             dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
             dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -644,50 +598,6 @@
             this.Column28.HeaderText = "Estructura";
             this.Column28.Name = "Column28";
             this.Column28.ReadOnly = true;
-            // 
-            // Column29
-            // 
-            this.Column29.Frozen = true;
-            this.Column29.HeaderText = "Dias que permanece la mercancia en almacen";
-            this.Column29.Name = "Column29";
-            this.Column29.ReadOnly = true;
-            // 
-            // Column30
-            // 
-            this.Column30.Frozen = true;
-            this.Column30.HeaderText = "Rotacion de cuentas por pagar";
-            this.Column30.Name = "Column30";
-            this.Column30.ReadOnly = true;
-            // 
-            // Column31
-            // 
-            this.Column31.HeaderText = "Plazo medio de pagos";
-            this.Column31.Name = "Column31";
-            this.Column31.ReadOnly = true;
-            // 
-            // Column32
-            // 
-            this.Column32.HeaderText = "Plazo medio de cobros";
-            this.Column32.Name = "Column32";
-            this.Column32.ReadOnly = true;
-            // 
-            // Column33
-            // 
-            this.Column33.HeaderText = "Dias financiados";
-            this.Column33.Name = "Column33";
-            this.Column33.ReadOnly = true;
-            // 
-            // Column34
-            // 
-            this.Column34.HeaderText = "Importe dias financiados";
-            this.Column34.Name = "Column34";
-            this.Column34.ReadOnly = true;
-            // 
-            // Column35
-            // 
-            this.Column35.HeaderText = "Utilidad de dias financiados";
-            this.Column35.Name = "Column35";
-            this.Column35.ReadOnly = true;
             // 
             // panel4
             // 
@@ -1083,29 +993,10 @@
         private System.Windows.Forms.TabControl tabControl2;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.DataGridView dgvCed1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column23;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column10;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column17;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column20;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column24;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column25;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column26;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column27;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.ComboBox cbEstructura2;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Button btnNuevo;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ComboBox cbEstructura;
         private System.Windows.Forms.ComboBox cbModificar;
         private System.Windows.Forms.CheckBox chbModificar;
         private System.Windows.Forms.Button btnGuardar;
@@ -1129,15 +1020,23 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox cbestructura3;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column28;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column29;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column30;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column31;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column32;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column33;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column34;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column35;
         private System.Windows.Forms.ComboBox comboBox2;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.ComboBox comboBox3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column11;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column12;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column13;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column14;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column15;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column16;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column17;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column18;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column19;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column20;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column24;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column25;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column26;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column27;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column28;
     }
 }

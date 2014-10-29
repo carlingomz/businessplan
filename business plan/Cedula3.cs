@@ -3800,22 +3800,24 @@ namespace business_plan
                 DialogResult boton = MessageBox.Show("Porfavor cambia el nombre", "Alerta", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (boton == DialogResult.OK)
                 {
-                    for (int i = 0; i <= dgvCed3.Rows.Count - 1; i++)
-                    {
-                        if (dgvCed3.Rows[0].Cells[0].Value != null)
-                        {
+                    tbnombre.Clear();
+                    tbnombre.Focus();
+
+                    //for (int i = 0; i <= dgvCed3.Rows.Count - 1; i++)
+                    //{
+                    //    if (dgvCed3.Rows[0].Cells[0].Value != null)
+                    //    {
                             #region actualizar
                             //query = "UPDATE cedula4 SET margeniniPor=" + margeninipor.ToString() + ",margeniniImp=" + margeniniImp + ",rebajasPor=" + rebajaspor.ToString() + ",rebajasImp=" + rebajasimp.ToString() + ",margenfinPor=" + margenfinpor.ToString() + ",margenfinImp=" + margenfinImp.ToString() + ",dppPor=" + dppPor.ToString() + ",dppImp=" + dppImp.ToString() + ",utilidadPor=" + utilidadpor.ToString() + ",utilidadImp=" + utilidadpor.ToString() + " where Escenario='" + tbEscenario.Text + "'";
                             //cmd = new MySqlCommand(query, Conn);
                             //cmd.ExecuteNonQuery();
                             #endregion
-                        }
-                        else
-                        {
-                            tbnombre.Clear();
-                            tbnombre.Focus();
-                        }
-                    }
+                    //    }
+                    //    else
+                    //    {
+                            
+                    //    }
+                    //}
                 }
                 else { }
             }
